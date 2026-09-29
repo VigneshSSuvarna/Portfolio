@@ -109,8 +109,8 @@ function App() {
     return months;
   };
 
-  // Generate calendar heatmap strictly bounded by today without rendering future boxes
-  const renderBoundedCalendar = (totalWeeks = 28) => {
+  // Generate Codeforces exact dark-theme calendar
+  const renderBoundedCalendar = (totalWeeks = 52) => {
     const weeks = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -134,23 +134,25 @@ function App() {
         
         const count = cfSubmissions[dateStr] || 0;
         
+        // Exact Codeforces Dark Theme Colors
         let colorClass = "bg-[#161b22]";
         if (count > 0) colorClass = "bg-[#0e4429]";
         if (count > 1) colorClass = "bg-[#006d32]";
         if (count >= 3) colorClass = "bg-[#26a641]";
+        if (count >= 5) colorClass = "bg-[#39d353]";
 
         daysInWeek.push(
           <div 
             key={dateStr} 
-            title={`${dateStr}: ${count} solved`}
-            className={`w-3.5 h-3.5 rounded-[3px] ${colorClass} transition-all duration-200 hover:scale-125`}
+            title={`${count} submissions on ${dateStr}`}
+            className={`w-[11px] h-[11px] rounded-[1px] ${colorClass}`}
           />
         );
       }
       
       if (daysInWeek.length > 0) {
         weeks.push(
-          <div key={w} className="flex flex-col gap-1">
+          <div key={w} className="flex flex-col gap-[2px]">
             {daysInWeek}
           </div>
         );
@@ -159,8 +161,7 @@ function App() {
     return weeks;
   };
 
-  const mainCardMonths = getDynamicMonths(28);
-  const modalAnnualMonths = getDynamicMonths(52);
+  const annualMonths = getDynamicMonths(52);
 
   return (
     <div className="min-h-screen bg-[#090a0f] text-neutral-100 font-sans selection:bg-blue-500/30 overflow-x-hidden">
@@ -261,68 +262,120 @@ function App() {
 
               <div className="w-full">
                 {activeHeatmap === 'github' ? (
-                  <div className="overflow-x-auto py-2">
-                    <div className="min-w-[600px] flex justify-center bg-neutral-950/60 p-4 rounded-2xl border border-neutral-800">
-                      <img 
-                        src="https://ghchart.rshah.org/26a641/VigneshSSuvarna" 
-                        alt="Vignesh's Github Contribution Graph" 
-                        className="w-full opacity-95"
-                      />
+                  <div className="animate-[fadeIn_0.3s_ease-out]">
+                    <div className="flex justify-between items-center mb-2 px-1">
+                      <div className="text-sm font-normal text-[#c9d1d9]">
+                        203 contributions in the last year
+                      </div>
+                      <div className="text-xs text-[#8b949e] flex items-center gap-1 cursor-pointer hover:text-[#c9d1d9]">
+                        Contribution settings <span className="text-[8px]">▼</span>
+                      </div>
+                    </div>
+                    
+                    {/* Exact GitHub Profile Dark Container */}
+                    <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-5 font-sans">
+                      <div className="overflow-x-auto">
+                        <div className="min-w-[700px] flex justify-center py-2 relative">
+                          <img 
+                            src="https://ghchart.rshah.org/VigneshSSuvarna" 
+                            alt="Vignesh's Github Contribution Graph" 
+                            className="w-full"
+                            style={{ filter: 'invert(1) hue-rotate(180deg) saturate(1.5) brightness(1.2)' }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center text-[11px] text-[#8b949e] pt-2 mt-2">
+                        <span className="hover:text-[#58a6ff] cursor-pointer">Learn how we count contributions</span>
+                        <div className="flex items-center gap-[3px]">
+                          <span className="mr-1">Less</span>
+                          <div className="w-[10px] h-[10px] rounded-[2px] bg-[#161b22] border border-[#1b222c]"></div>
+                          <div className="w-[10px] h-[10px] rounded-[2px] bg-[#0e4429] border border-[#003d16]"></div>
+                          <div className="w-[10px] h-[10px] rounded-[2px] bg-[#006d32] border border-[#005224]"></div>
+                          <div className="w-[10px] h-[10px] rounded-[2px] bg-[#26a641] border border-[#1e8633]"></div>
+                          <div className="w-[10px] h-[10px] rounded-[2px] bg-[#39d353] border border-[#2ea043]"></div>
+                          <span className="ml-1">More</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-neutral-950/60 p-6 rounded-2xl border border-neutral-800 space-y-4">
-                    <div className="flex justify-between items-center flex-wrap gap-2">
-                      <div className="text-sm font-semibold text-neutral-300">
-                        <span className="text-white font-bold text-base">{cfStats.solved}</span> Problems Solved · Rating <span className="text-blue-400 font-bold">{cfStats.rating}</span>
-                      </div>
-                    </div>
-
+                  <div className="animate-[fadeIn_0.3s_ease-out]">
                     {loadingCf ? (
                       <div className="text-center py-8 text-neutral-500 text-sm animate-pulse">Loading Codeforces Heatmap...</div>
                     ) : (
-                      <div className="overflow-x-auto py-3">
-                        <div className="w-full bg-neutral-900/40 p-4 rounded-xl border border-neutral-800/80">
-                          {/* Dynamic Months Header */}
-                          <div className="flex justify-between text-[10px] text-neutral-400 mb-2 px-6 font-medium">
-                            {mainCardMonths.map((m, idx) => (
-                              <span key={idx}>{m}</span>
-                            ))}
-                          </div>
+                      /* Exact Codeforces Dark Theme Container */
+                      <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-6 w-full font-sans shadow-sm text-[#c9d1d9]">
+                        <div className="flex justify-end items-center mb-6 text-[13px] text-[#c9d1d9] gap-2 font-normal">
+                          <span>What activity will be shown to other users:</span>
+                          <select className="border border-[#30363d] rounded-[3px] px-2 py-0.5 bg-[#161b22] text-[#c9d1d9] outline-none cursor-pointer"><option>All</option></select>
+                          <select className="border border-[#30363d] rounded-[3px] px-2 py-0.5 bg-[#161b22] text-[#c9d1d9] outline-none cursor-pointer"><option>Choose year</option></select>
+                        </div>
 
-                          <div className="flex gap-2">
-                            {/* Weekday Labels */}
-                            <div className="flex flex-col justify-between text-[10px] text-neutral-500 pr-1 py-0.5">
-                              <span>Mon</span>
-                              <span>Wed</span>
-                              <span>Fri</span>
+                        <div className="overflow-x-auto pb-4 border-b border-[#30363d]/60">
+                          <div className="min-w-[750px]">
+                            {/* Months Header */}
+                            <div className="flex justify-between text-[11px] text-[#8b949e] mb-2 px-8">
+                              {annualMonths.map((m, idx) => (
+                                <span key={idx}>{m}</span>
+                              ))}
                             </div>
 
-                            {/* Heatmap Grid Columns */}
-                            <div className="flex gap-1.5 flex-1 justify-between">
-                              {renderBoundedCalendar(28)}
+                            <div className="flex gap-2">
+                              {/* Weekday Labels */}
+                              <div className="flex flex-col justify-between text-[11px] text-[#8b949e] pr-2 py-1 h-[105px]">
+                                <span className="mt-0.5">Mon</span>
+                                <span className="mt-2.5">Wed</span>
+                                <span className="mt-2.5">Fri</span>
+                                <span className="mb-0.5"></span>
+                              </div>
+
+                              {/* Grid */}
+                              <div className="flex gap-[2px] flex-1 justify-between">
+                                {renderBoundedCalendar(52)}
+                              </div>
                             </div>
                           </div>
                         </div>
+
+                        {/* Exact Stats Footer layout matching the image */}
+                        <div className="grid grid-cols-3 gap-y-8 mt-6 px-4">
+                          <div>
+                            <div className="text-[22px] text-white font-medium leading-tight">{cfStats.solved} problems</div>
+                            <div className="text-[12px] text-[#8b949e]">solved for all time</div>
+                          </div>
+                          <div>
+                            <div className="text-[22px] text-white font-medium leading-tight">{cfStats.solved} problems</div>
+                            <div className="text-[12px] text-[#8b949e]">solved for the last year</div>
+                          </div>
+                          <div>
+                            <div className="text-[22px] text-white font-medium leading-tight">0 problems</div>
+                            <div className="text-[12px] text-[#8b949e]">solved for the last month</div>
+                          </div>
+                          <div>
+                            <div className="text-[22px] text-white font-medium leading-tight">1 days</div>
+                            <div className="text-[12px] text-[#8b949e]">in a row max.</div>
+                          </div>
+                          <div>
+                            <div className="text-[22px] text-white font-medium leading-tight">1 days</div>
+                            <div className="text-[12px] text-[#8b949e]">in a row for the last year</div>
+                          </div>
+                          <div>
+                            <div className="text-[22px] text-white font-medium leading-tight">0 days</div>
+                            <div className="text-[12px] text-[#8b949e]">in a row for the last month</div>
+                          </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-end">
+                           <button 
+                             onClick={() => setShowAnalyticsModal(true)}
+                             className="text-xs text-blue-400 hover:underline font-medium bg-transparent border-none cursor-pointer"
+                           >
+                             Expand Detailed Analytics →
+                           </button>
+                        </div>
                       </div>
                     )}
-
-                    <div className="flex justify-between items-center pt-2 border-t border-neutral-800/80">
-                      <button 
-                        onClick={() => setShowAnalyticsModal(true)}
-                        className="text-xs text-blue-400 hover:underline font-medium bg-transparent border-none cursor-pointer p-0"
-                      >
-                        Expand Detailed Analytics →
-                      </button>
-                      <div className="flex items-center gap-2 text-xs text-neutral-500">
-                        <span>Less</span>
-                        <div className="w-3 h-3 rounded-sm bg-[#161b22]"></div>
-                        <div className="w-3 h-3 rounded-sm bg-[#0e4429]"></div>
-                        <div className="w-3 h-3 rounded-sm bg-[#006d32]"></div>
-                        <div className="w-3 h-3 rounded-sm bg-[#26a641]"></div>
-                        <span>More</span>
-                      </div>
-                    </div>
                   </div>
                 )}
               </div>
@@ -477,17 +530,21 @@ function App() {
                 </h3>
               </div>
 
-              <div className="bg-neutral-950/60 p-6 rounded-2xl border border-neutral-800 overflow-x-auto">
-                <div className="min-w-[850px] flex justify-between text-xs text-neutral-400 mb-2 px-8 font-medium">
-                  {modalAnnualMonths.map((m, idx) => (
+              {/* Ensure Modal Codeforces container stays dark */}
+              <div className="bg-[#0d1117] border border-[#30363d] rounded-xl p-6 shadow-lg overflow-x-auto">
+                <div className="min-w-[850px] flex justify-between text-[11px] text-[#8b949e] mb-2 px-8 font-medium">
+                  {annualMonths.map((m, idx) => (
                     <span key={idx}>{m}</span>
                   ))}
                 </div>
                 <div className="min-w-[850px] flex gap-2 justify-center">
-                  <div className="flex flex-col justify-between text-[10px] text-neutral-500 py-1">
-                    <span>Mon</span><span>Wed</span><span>Fri</span>
+                  <div className="flex flex-col justify-between text-[11px] text-[#8b949e] py-1 h-[105px]">
+                    <span className="mt-0.5">Mon</span>
+                    <span className="mt-2.5">Wed</span>
+                    <span className="mt-2.5">Fri</span>
+                    <span className="mb-0.5"></span>
                   </div>
-                  <div className="flex gap-1 flex-1 justify-between">
+                  <div className="flex gap-[2px] flex-1 justify-between">
                     {renderBoundedCalendar(52)}
                   </div>
                 </div>
