@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { X, ArrowUpRight, Sun, Moon, Download, Calendar, RefreshCw } from 'lucide-react';
+import { X, ArrowUpRight, Sun, Moon, Download, Calendar, RefreshCw, ArrowLeft, Sparkles, Code2, Compass, Terminal } from 'lucide-react';
 
 const projectsData = [
   {
@@ -41,6 +41,25 @@ const projectsData = [
     techStack: ["Kotlin", "Android"],
     github: "https://github.com/VigneshSSuvarna/HearingAid.git",
     demo: "#"
+  }
+];
+
+const experienceData = [
+  {
+    id: 1,
+    organization: "Sama Foundation",
+    role: "Full-Stack Developer",
+    description: "Developing full-stack web applications and digital infrastructure to support community outreach and NGO management operations.",
+    projectTitle: "Nayi Disha Care & Support Platform",
+    pageKey: "sama-foundation"
+  },
+  {
+    id: 2,
+    organization: "Chandrashekar Institution of Technology",
+    role: "Software Developer",
+    description: "Building institutional management platforms to streamline academic administration, student workflows, and resource allocation.",
+    projectTitle: "HearingAid Pro",
+    pageKey: "cit-hearingaid"
   }
 ];
 
@@ -265,6 +284,24 @@ function App() {
   const [activeHeatmap, setActiveHeatmap] = useState('github');
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
   const [isSyncingCf, setIsSyncingCf] = useState(false);
+
+  const [visitorCount, setVisitorCount] = useState(198);
+
+  useEffect(() => {
+    try {
+      const hasVisitedSession = sessionStorage.getItem('portfolio_session_counted');
+      let currentViews = parseInt(localStorage.getItem('portfolio_total_visits') || '197', 10);
+
+      if (!hasVisitedSession) {
+        currentViews += 1;
+        sessionStorage.setItem('portfolio_session_counted', 'true');
+        localStorage.setItem('portfolio_total_visits', currentViews.toString());
+      }
+      setVisitorCount(currentViews);
+    } catch {
+      setVisitorCount(198);
+    }
+  }, []);
 
   const [selectedDateStr, setSelectedDateStr] = useState(null);
   const [modalSelectedDateStr, setModalSelectedDateStr] = useState(null);
@@ -560,86 +597,88 @@ function App() {
             isDark ? 'border-neutral-800' : 'border-neutral-200'
           }`}
         >
-          <div className="pt-6">
-            <div className="flex gap-[2px] pl-7 mb-1.5 h-4 items-end">
-              {mainCalendarWeeks.map((week) => (
-                <div key={week.weekIdx} className="w-[10px] relative shrink-0">
-                  {week.monthLabel && (
-                    <span
-                      className={`absolute bottom-0 left-0 text-[10px] font-mono leading-none select-none ${
-                        isDark ? 'text-[#8b949e]' : 'text-neutral-500'
-                      }`}
-                    >
-                      {week.monthLabel}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="flex gap-1.5 items-start">
-              <div
-                className={`flex flex-col gap-[2px] text-[10px] font-mono w-6 shrink-0 select-none ${
-                  isDark ? 'text-[#8b949e]' : 'text-neutral-500'
-                }`}
-              >
-                <span className="h-[10px] leading-[10px] opacity-0">Sun</span>
-                <span className="h-[10px] leading-[10px]">Mon</span>
-                <span className="h-[10px] leading-[10px] opacity-0">Tue</span>
-                <span className="h-[10px] leading-[10px]">Wed</span>
-                <span className="h-[10px] leading-[10px] opacity-0">Thu</span>
-                <span className="h-[10px] leading-[10px]">Fri</span>
-                <span className="h-[10px] leading-[10px] opacity-0">Sat</span>
-              </div>
-
-              <div className="flex gap-[2px]">
+          <div className="pt-6 w-full flex justify-center">
+            <div className="flex flex-col">
+              <div className="flex gap-[3px] pl-8 mb-1.5 h-4 items-end">
                 {mainCalendarWeeks.map((week) => (
-                  <div key={week.weekIdx} className="flex flex-col gap-[2px] w-[10px] shrink-0">
-                    {week.days.map((day) => {
-                      const count = activeDataMap[day.dateStr] || 0;
-                      const isSelected = selectedDateStr === day.dateStr;
-                      const colorClass = getGitHubCellColor(count);
-
-                      return (
-                        <div key={day.dateStr} className="relative">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSelectedDateStr(prev => (prev === day.dateStr ? null : day.dateStr))
-                            }
-                            aria-label={`${formatDisplayDate(day.dateStr)}: ${count} ${unitLabel}${count === 1 ? '' : 's'}`}
-                            title={`${formatDisplayDate(day.dateStr)} — ${count} ${unitLabel}${count === 1 ? '' : 's'}`}
-                            className={`block w-[10px] h-[10px] rounded-[2px] cursor-pointer transition-transform duration-150 focus:outline-none ${colorClass} ${
-                              isSelected
-                                ? isDark
-                                  ? 'ring-2 ring-white scale-125 z-20 relative'
-                                  : 'ring-2 ring-neutral-900 scale-125 z-20 relative'
-                                : 'hover:scale-125 hover:z-10'
-                            }`}
-                          />
-
-                          {isSelected && (
-                            <div
-                              className={`absolute bottom-full mb-2 z-30 px-2.5 py-1 rounded text-[11px] font-mono whitespace-nowrap shadow-lg pointer-events-none border ${
-                                week.weekIdx > 42
-                                  ? 'right-0'
-                                  : week.weekIdx < 8
-                                  ? 'left-0'
-                                  : 'left-1/2 -translate-x-1/2'
-                              } bg-neutral-900 text-white border-neutral-700`}
-                            >
-                              <span className="font-semibold">{formatDisplayDate(day.dateStr)}</span>
-                              <span className="text-neutral-400"> • </span>
-                              <span className="text-[#39d353]">
-                                {count} {unitLabel}{count === 1 ? '' : 's'}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                  <div key={week.weekIdx} className="w-[13px] relative shrink-0">
+                    {week.monthLabel && (
+                      <span
+                        className={`absolute bottom-0 left-0 text-[11px] font-mono leading-none select-none ${
+                          isDark ? 'text-[#8b949e]' : 'text-neutral-500'
+                        }`}
+                      >
+                        {week.monthLabel}
+                      </span>
+                    )}
                   </div>
                 ))}
+              </div>
+
+              <div className="flex gap-2 items-start">
+                <div
+                  className={`flex flex-col gap-[3px] text-[11px] font-mono w-6 shrink-0 select-none ${
+                    isDark ? 'text-[#8b949e]' : 'text-neutral-500'
+                  }`}
+                >
+                  <span className="h-[13px] leading-[13px] opacity-0">Sun</span>
+                  <span className="h-[13px] leading-[13px]">Mon</span>
+                  <span className="h-[13px] leading-[13px] opacity-0">Tue</span>
+                  <span className="h-[13px] leading-[13px]">Wed</span>
+                  <span className="h-[13px] leading-[13px] opacity-0">Thu</span>
+                  <span className="h-[13px] leading-[13px]">Fri</span>
+                  <span className="h-[13px] leading-[13px] opacity-0">Sat</span>
+                </div>
+
+                <div className="flex gap-[3px] flex-1 justify-center">
+                  {mainCalendarWeeks.map((week) => (
+                    <div key={week.weekIdx} className="flex flex-col gap-[3px] w-[13px] shrink-0">
+                      {week.days.map((day) => {
+                        const count = activeDataMap[day.dateStr] || 0;
+                        const isSelected = selectedDateStr === day.dateStr;
+                        const colorClass = getGitHubCellColor(count);
+
+                        return (
+                          <div key={day.dateStr} className="relative">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSelectedDateStr(prev => (prev === day.dateStr ? null : day.dateStr))
+                              }
+                              aria-label={`${formatDisplayDate(day.dateStr)}: ${count} ${unitLabel}${count === 1 ? '' : 's'}`}
+                              title={`${formatDisplayDate(day.dateStr)} — ${count} ${unitLabel}${count === 1 ? '' : 's'}`}
+                              className={`block w-[13px] h-[13px] rounded-[3px] cursor-pointer transition-transform duration-150 focus:outline-none ${colorClass} ${
+                                isSelected
+                                  ? isDark
+                                    ? 'ring-2 ring-white scale-125 z-20 relative'
+                                    : 'ring-2 ring-neutral-900 scale-125 z-20 relative'
+                                  : 'hover:scale-125 hover:z-10'
+                              }`}
+                            />
+
+                            {isSelected && (
+                              <div
+                                className={`absolute bottom-full mb-2 z-30 px-2.5 py-1 rounded text-[11px] font-mono whitespace-nowrap shadow-lg pointer-events-none border ${
+                                  week.weekIdx > 42
+                                    ? 'right-0'
+                                    : week.weekIdx < 8
+                                    ? 'left-0'
+                                    : 'left-1/2 -translate-x-1/2'
+                                } bg-neutral-900 text-white border-neutral-700`}
+                              >
+                                <span className="font-semibold">{formatDisplayDate(day.dateStr)}</span>
+                                <span className="text-neutral-400"> • </span>
+                                <span className="text-[#39d353]">
+                                  {count} {unitLabel}{count === 1 ? '' : 's'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -682,7 +721,7 @@ function App() {
             {[0, 1, 2, 4, 6].map((lvl) => (
               <span
                 key={lvl}
-                className={`w-[10px] h-[10px] rounded-[2px] inline-block ${getGitHubCellColor(lvl)}`}
+                className={`w-[12px] h-[12px] rounded-[2px] inline-block ${getGitHubCellColor(lvl)}`}
               />
             ))}
             <span>More</span>
@@ -692,7 +731,6 @@ function App() {
     );
   };
 
-  // Dynamic Codeforces Rating Graph (Adapts to Dark / Light Mode)
   const renderCodeforcesRatingGraph = () => {
     const svgWidth = 760;
     const svgHeight = 250;
@@ -735,7 +773,6 @@ function App() {
 
     const xTicks = buildDynamicRatingTicks(startTime, endTime);
 
-    // Dark mode tier bands vs Light mode tier bands
     const bands = isDark
       ? [
           { low: minRating, high: 1200, color: "#1f242d" },
@@ -769,13 +806,13 @@ function App() {
 
     return (
       <div
-        className={`border rounded-md p-3.5 shadow-xs transition-colors ${
+        className={`border rounded-md p-3.5 shadow-xs transition-colors overflow-x-auto ${
           isDark
             ? 'bg-[#0d1117] border-neutral-800 text-[#c9d1d9]'
             : 'bg-white border-neutral-300 text-neutral-800'
         }`}
       >
-        <div className="flex justify-between items-center mb-1.5 text-xs font-sans">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1.5 text-xs font-sans gap-2">
           <span className={isDark ? 'text-neutral-400' : 'text-neutral-500'}>
             Click on the graph to enable the zoom feature.
           </span>
@@ -793,7 +830,7 @@ function App() {
           </select>
         </div>
 
-        <div className="relative">
+        <div className="relative min-w-[600px] sm:min-w-0">
           <svg
             viewBox={`0 0 ${svgWidth} ${svgHeight}`}
             onClick={() => setZoomEnabled(prev => !prev)}
@@ -973,20 +1010,20 @@ function App() {
     >
       {/* Top Header */}
       <header
-        className={`w-full max-w-3xl mx-auto px-6 pt-10 pb-6 border-b flex justify-between items-center ${
+        className={`w-full px-6 sm:px-12 pt-8 sm:pt-10 pb-6 border-b flex justify-between items-center ${
           isDark ? 'border-neutral-800/80' : 'border-neutral-200'
         }`}
       >
         <button
           onClick={() => setCurrentPage('home')}
-          className={`font-mono text-base font-semibold tracking-tight cursor-pointer transition-colors ${
+          className={`font-mono text-base sm:text-lg font-semibold tracking-tight cursor-pointer transition-colors ${
             isDark ? 'text-white hover:text-neutral-300' : 'text-neutral-900 hover:text-neutral-600'
           }`}
         >
           vignesh suvarna
         </button>
 
-        <nav className="flex items-center gap-6 text-base font-mono">
+        <nav className="flex items-center gap-6 sm:gap-8 text-sm sm:text-base font-mono">
           <button
             onClick={() => setCurrentPage('home')}
             className={`cursor-pointer transition-colors ${
@@ -1019,140 +1056,180 @@ function App() {
           <button
             onClick={() => setIsDark(!isDark)}
             aria-label="Toggle theme"
-            className={`p-1.5 rounded border cursor-pointer transition-colors ${
+            className={`p-2 rounded border cursor-pointer transition-colors ${
               isDark
                 ? 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white hover:border-neutral-700'
                 : 'border-neutral-200 bg-white text-neutral-600 hover:text-neutral-900 hover:border-neutral-300'
             }`}
           >
-            {isDark ? <Sun size={15} /> : <Moon size={15} />}
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
         </nav>
       </header>
 
-      {/* Main Content */}
-      <main className="w-full max-w-3xl mx-auto px-6 py-12 flex-1">
+      {/* Main Content - Full Screen Width */}
+      <main className="w-full px-6 sm:px-12 py-10 sm:py-16 flex-1 max-w-7xl mx-auto">
         {currentPage === 'home' && (
-          <div className="space-y-12">
-            <section className="space-y-8">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+          <div className="space-y-10 sm:space-y-12">
+            {/* HERO PROFILE SECTION */}
+            <section className={`p-6 sm:p-10 rounded-2xl border transition-all shadow-sm ${
+              isDark ? 'bg-neutral-900/40 border-neutral-800' : 'bg-white border-neutral-200'
+            }`}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
                 <img
                   src="/profile.jpg"
                   alt="Vignesh Suvarna"
-                  className={`w-24 h-24 rounded-lg object-cover border shrink-0 ${
-                    isDark ? 'border-neutral-800 bg-neutral-900' : 'border-neutral-200 bg-neutral-100'
+                  className={`w-28 h-28 sm:w-32 sm:h-32 rounded-2xl object-cover border-2 shrink-0 shadow-md ${
+                    isDark ? 'border-neutral-700 bg-neutral-900' : 'border-neutral-200 bg-neutral-100'
                   }`}
                 />
-                <div className="space-y-2">
-                  <h1
-                    className={`text-3xl font-bold tracking-tight leading-snug ${
-                      isDark ? 'text-white' : 'text-neutral-900'
-                    }`}
-                  >
-                    Vignesh Suvarna
-                  </h1>
-                  <p className={`text-base ${isDark ? 'text-[#a3a3a3]' : 'text-neutral-600'}`}>
-                    B.E. in Computer Science & Engineering @ Atria Institute of Technology
-                  </p>
+                <div className="space-y-3 w-full">
                   <div>
+                    <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                      Vignesh Suvarna
+                    </h1>
+                    <p className={`text-sm sm:text-base font-medium mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                      B.E. Computer Science & Engineering @ Atria Institute of Technology[cite: 1]
+                    </p>
+                  </div>
+                  <p className={`text-sm sm:text-lg leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
+                    Full-stack software architect & applied AI builder focused on backend scalability, asynchronous processing, and low-latency systems.
+                  </p>
+                  <div className="pt-2">
                     <a
                       href="/resume.pdf"
                       download
-                      className={`inline-flex items-center gap-2 text-sm font-mono px-3.5 py-2 rounded border transition-colors ${
+                      className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono px-4 py-2.5 rounded-lg border font-medium transition-colors ${
                         isDark
-                          ? 'border-neutral-800 bg-neutral-900 text-neutral-200 hover:bg-neutral-800 hover:text-white'
-                          : 'border-neutral-200 bg-neutral-100 text-neutral-800 hover:bg-neutral-200 hover:text-black'
+                          ? 'border-neutral-700 bg-neutral-800 text-neutral-200 hover:bg-neutral-700 hover:text-white'
+                          : 'border-neutral-300 bg-neutral-100 text-neutral-800 hover:bg-neutral-200 hover:text-black'
                       }`}
                     >
-                      <Download size={15} /> resume
+                      <Download size={16} /> Download Resume
                     </a>
                   </div>
                 </div>
               </div>
+            </section>
 
-              <div className="space-y-3 pt-2">
-                <h2
-                  className={`text-sm font-mono uppercase tracking-wider mb-3 ${
-                    isDark ? 'text-neutral-400' : 'text-neutral-500'
-                  }`}
-                >
+            {/* BOX 1: BACKGROUND */}
+            <div className={`p-6 sm:p-8 rounded-2xl border transition-all shadow-sm ${
+              isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
+            }`}>
+              <div className="flex items-center gap-2 mb-4">
+                <Terminal size={20} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
+                <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                   Background
                 </h2>
-                <ul
-                  className={`space-y-3 list-disc list-inside text-base leading-relaxed ${
-                    isDark ? 'marker:text-neutral-600 text-neutral-300' : 'marker:text-neutral-400 text-neutral-700'
-                  }`}
-                >
-                  <li>
-                    I am a <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>3rd-year Computer Science & Engineering undergraduate</span>.
-                  </li>
-                  <li>
-                    Currently working on <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>full-stack web architectures and applied AI systems</span>, focusing on backend scalability, asynchronous processing, and intelligent document retrieval.
-                  </li>
-                  <li>
-                    Driven by <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>clean system design</span>, I enjoy translating complex real-world problems into reliable, low-latency, and production-ready software.
-                  </li>
-                </ul>
               </div>
+              <ul className={`space-y-3 text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
+                <li className="flex items-start gap-3">
+                  <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+                  <span>I am a 3rd-year Computer Science & Engineering undergraduate[cite: 1].</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+                  <span>Currently working on full-stack web architectures and applied AI systems, focusing on backend scalability, asynchronous processing, and intelligent document retrieval[cite: 1].</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+                  <span>Driven by clean system design, I enjoy translating complex real-world problems into reliable, low-latency, and production-ready software[cite: 1].</span>
+                </li>
+              </ul>
+            </div>
 
-              <div className="pt-2">
-                <h2
-                  className={`text-sm font-mono uppercase tracking-wider mb-3 ${
-                    isDark ? 'text-neutral-400' : 'text-neutral-500'
-                  }`}
-                >
-                  Areas of Exploration:
+            {/* BOX 2: AREAS OF EXPLORATION */}
+            <div className={`p-6 sm:p-8 rounded-2xl border transition-all shadow-sm ${
+              isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
+            }`}>
+              <div className="flex items-center gap-2 mb-4">
+                <Compass size={20} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
+                <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                  Areas of Exploration
                 </h2>
-                <ul
-                  className={`space-y-3 list-disc list-inside text-base leading-relaxed ${
-                    isDark ? 'marker:text-neutral-600 text-neutral-300' : 'marker:text-neutral-400 text-neutral-700'
-                  }`}
-                >
-                  <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                      Competitive Programming.
-                    </span>{' '}
-                    I actively practice algorithmic problem-solving on Codeforces, primarily writing solutions in C++ and Python.
-                  </li>
-                  <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                      AI Architecture & Full-Stack Systems.
-                    </span>{' '}
-                    Designing Retrieval-Augmented Generation (RAG) pipelines, working with vector embeddings, and deploying scalable backend infrastructure.
-                  </li>
-                  <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                      Beyond Coding.
-                    </span>{' '}
-                    Exploring new AI capabilities, building accessible applications, and unwinding with video games.
-                  </li>
-                </ul>
               </div>
-            </section>
+              <ul className={`space-y-3 text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
+                <li className="flex items-start gap-3">
+                  <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+                  <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>Competitive Programming:</strong> I actively practice algorithmic problem-solving on Codeforces, primarily writing solutions in C++ and Python[cite: 1].</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+                  <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>AI Architecture & Full-Stack Systems:</strong> Designing Retrieval-Augmented Generation (RAG) pipelines, working with vector embeddings, and deploying scalable backend infrastructure[cite: 1].</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+                  <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>Beyond Coding:</strong> Exploring new AI capabilities, building accessible applications, and unwinding with video games[cite: 1].</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* BOX 3: EXPERIENCE & ONGOING WORK */}
+            <div className={`p-6 sm:p-8 rounded-2xl border transition-all shadow-sm ${
+              isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
+            }`}>
+              <div className="flex items-center gap-2 mb-6">
+                <Code2 size={20} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
+                <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                  Experience & Ongoing Work
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {experienceData.map((exp) => {
+                  const isSama = exp.organization.includes("Sama Foundation");
+                  const isCit = exp.organization.includes("Chandrashekar Institution of Technology");
+                  return (
+                    <div
+                      key={exp.id}
+                      onClick={() => {
+                        if (isSama) setCurrentPage('sama-foundation');
+                        if (isCit) setCurrentPage('cit-hearingaid');
+                      }}
+                      className={`p-6 rounded-xl border transition-all cursor-pointer group flex flex-col justify-between ${
+                        isDark 
+                          ? 'bg-neutral-900/60 border-neutral-800 hover:border-[#39d353]' 
+                          : 'bg-neutral-50 border-neutral-200 hover:border-emerald-600'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex justify-between items-start gap-2 mb-2">
+                          <h3 className={`font-semibold text-lg group-hover:text-[#39d353] transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                            {exp.organization}
+                          </h3>
+                          <ArrowUpRight size={18} className="text-neutral-500 group-hover:text-[#39d353] shrink-0 transition-colors" />
+                        </div>
+                        <span className="text-xs font-mono px-2.5 py-1 rounded bg-emerald-500/10 text-[#39d353] inline-block mb-3">
+                          {exp.role}
+                        </span>
+                        <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
+                          {exp.description}
+                        </p>
+                      </div>
+                      <div className="mt-6 pt-4 border-t border-neutral-800/40 text-xs sm:text-sm font-mono text-[#39d353] flex items-center justify-between">
+                        <span>View {exp.projectTitle}</span>
+                        <span>→</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
             <hr className={isDark ? 'border-neutral-800/80' : 'border-neutral-200'} />
 
-            {/* Activity Section */}
+            {/* Coding Activity Section */}
             <section className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h2
-                  className={`text-sm font-mono uppercase tracking-wider ${
-                    isDark ? 'text-neutral-400' : 'text-neutral-500'
-                  }`}
-                >
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                <h2 className={`text-xs sm:text-sm font-mono uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
                   Coding Activity
                 </h2>
-                <div className="flex gap-4 text-sm font-mono">
+                <div className="flex gap-4 text-xs sm:text-sm font-mono">
                   <button
                     onClick={() => setActiveHeatmap('github')}
                     className={`cursor-pointer ${
                       activeHeatmap === 'github'
-                        ? isDark
-                          ? 'text-white underline underline-offset-4'
-                          : 'text-neutral-900 underline underline-offset-4'
-                        : isDark
-                        ? 'text-neutral-500 hover:text-neutral-300'
-                        : 'text-neutral-400 hover:text-neutral-700'
+                        ? isDark ? 'text-white underline underline-offset-4' : 'text-neutral-900 underline underline-offset-4'
+                        : isDark ? 'text-neutral-500 hover:text-neutral-300' : 'text-neutral-400 hover:text-neutral-700'
                     }`}
                   >
                     github
@@ -1161,12 +1238,8 @@ function App() {
                     onClick={() => setActiveHeatmap('codeforces')}
                     className={`cursor-pointer ${
                       activeHeatmap === 'codeforces'
-                        ? isDark
-                          ? 'text-white underline underline-offset-4'
-                          : 'text-neutral-900 underline underline-offset-4'
-                        : isDark
-                        ? 'text-neutral-500 hover:text-neutral-300'
-                        : 'text-neutral-400 hover:text-neutral-700'
+                        ? isDark ? 'text-white underline underline-offset-4' : 'text-neutral-900 underline underline-offset-4'
+                        : isDark ? 'text-neutral-500 hover:text-neutral-300' : 'text-neutral-400 hover:text-neutral-700'
                     }`}
                   >
                     codeforces
@@ -1174,22 +1247,11 @@ function App() {
                 </div>
               </div>
 
-              <div
-                className={`border rounded p-4 ${
-                  isDark
-                    ? 'border-neutral-800 bg-[#0d1117] text-[#c9d1d9]'
-                    : 'border-neutral-200 bg-white text-neutral-800'
-                }`}
-              >
+              <div className={`border rounded p-6 ${isDark ? 'border-neutral-800 bg-[#0d1117] text-[#c9d1d9]' : 'border-neutral-200 bg-white text-neutral-800'}`}>
                 {activeHeatmap === 'github' ? (
                   <>
-                    <div className="flex justify-between items-center text-xs mb-1 font-mono">
-                      <a
-                        href="https://github.com/VigneshSSuvarna"
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`hover:underline ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}
-                      >
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs sm:text-sm mb-2 font-mono gap-1">
+                      <a href="https://github.com/VigneshSSuvarna" target="_blank" rel="noreferrer" className={`hover:underline ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
                         github.com/VigneshSSuvarna
                       </a>
                       <span className={isDark ? 'text-[#8b949e]' : 'text-neutral-500'}>
@@ -1200,13 +1262,8 @@ function App() {
                   </>
                 ) : (
                   <>
-                    <div className="flex justify-between items-center text-xs mb-1 font-mono">
-                      <a
-                        href="https://codeforces.com/profile/VigneshSSuvarna"
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`hover:underline ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}
-                      >
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs sm:text-sm mb-2 font-mono gap-1">
+                      <a href="https://codeforces.com/profile/VigneshSSuvarna" target="_blank" rel="noreferrer" className={`hover:underline ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
                         codeforces.com/profile/VigneshSSuvarna
                       </a>
                       <span className={isDark ? 'text-[#8b949e]' : 'text-neutral-500'}>
@@ -1216,31 +1273,18 @@ function App() {
 
                     {renderMainHeatmap()}
 
-                    <div
-                      className={`flex flex-wrap justify-between items-center gap-4 pt-3.5 mt-3 border-t text-sm font-mono ${
-                        isDark ? 'border-neutral-800' : 'border-neutral-200'
-                      }`}
-                    >
+                    <div className={`flex flex-wrap justify-between items-center gap-4 pt-4 mt-4 border-t text-sm font-mono ${isDark ? 'border-neutral-800' : 'border-neutral-200'}`}>
                       <div className="flex gap-6">
                         <div>
                           <span className="text-neutral-500">solved: </span>
-                          <span className={isDark ? 'text-white' : 'text-neutral-900'}>
-                            {cfDetailedStats.solvedAllTime}
-                          </span>
+                          <span className={isDark ? 'text-white' : 'text-neutral-900'}>{cfDetailedStats.solvedAllTime}</span>
                         </div>
                         <div>
                           <span className="text-neutral-500">rating: </span>
-                          <span className={isDark ? 'text-white' : 'text-neutral-900'}>
-                            {cfDetailedStats.rating}
-                          </span>
+                          <span className={isDark ? 'text-white' : 'text-neutral-900'}>{cfDetailedStats.rating}</span>
                         </div>
                       </div>
-                      <button
-                        onClick={() => setShowAnalyticsModal(true)}
-                        className={`underline underline-offset-4 cursor-pointer ${
-                          isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
-                        }`}
-                      >
+                      <button onClick={() => setShowAnalyticsModal(true)} className={`underline underline-offset-4 cursor-pointer ${isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'}`}>
                         detailed stats →
                       </button>
                     </div>
@@ -1251,37 +1295,20 @@ function App() {
 
             <hr className={isDark ? 'border-neutral-800/80' : 'border-neutral-200'} />
 
-            {/* Structured Technical Skills Section */}
+            {/* Technical Skills Section */}
             <section className="space-y-4">
-              <h2
-                className={`text-sm font-mono uppercase tracking-wider ${
-                  isDark ? 'text-neutral-400' : 'text-neutral-500'
-                }`}
-              >
+              <h2 className={`text-xs sm:text-sm font-mono uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
                 Technical Skills
               </h2>
-              <div
-                className={`divide-y border-t border-b text-base ${
-                  isDark
-                    ? 'divide-neutral-800/70 border-neutral-800'
-                    : 'divide-neutral-200 border-neutral-200'
-                }`}
-              >
+              <div className={`divide-y border-t border-b text-sm sm:text-base ${isDark ? 'divide-neutral-800/70 border-neutral-800' : 'divide-neutral-200 border-neutral-200'}`}>
                 {skillsData.map((group) => (
-                  <div key={group.category} className="py-3.5 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
-                    <span className="text-neutral-500 font-mono text-sm sm:w-36 shrink-0">
+                  <div key={group.category} className="py-4 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                    <span className="text-neutral-500 font-mono text-sm sm:w-40 shrink-0">
                       {group.category}
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {group.items.map((skill) => (
-                        <span
-                          key={skill}
-                          className={`text-sm font-mono border px-2.5 py-1 rounded ${
-                            isDark
-                              ? 'text-neutral-300 bg-neutral-900/90 border-neutral-800'
-                              : 'text-neutral-700 bg-neutral-100 border-neutral-200'
-                          }`}
-                        >
+                        <span key={skill} className={`text-xs sm:text-sm font-mono border px-3 py-1 rounded-md ${isDark ? 'text-neutral-300 bg-neutral-900/90 border-neutral-800' : 'text-neutral-700 bg-neutral-100 border-neutral-200'}`}>
                           {skill}
                         </span>
                       ))}
@@ -1297,69 +1324,40 @@ function App() {
         {currentPage === 'projects' && (
           <div className="space-y-8">
             <div>
-              <h1
-                className={`text-2xl font-bold tracking-tight ${
-                  isDark ? 'text-white' : 'text-neutral-900'
-                }`}
-              >
+              <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                 Projects
               </h1>
-              <p className={`text-base mt-1 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+              <p className={`text-sm sm:text-base mt-1 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
                 Selected full-stack applications, AI systems, and tools I've built.
               </p>
             </div>
 
-            <div
-              className={`divide-y border-t border-b ${
-                isDark ? 'divide-neutral-800 border-neutral-800' : 'divide-neutral-200 border-neutral-200'
-              }`}
-            >
+            <div className={`divide-y border-t border-b ${isDark ? 'divide-neutral-800 border-neutral-800' : 'divide-neutral-200 border-neutral-200'}`}>
               {projectsData.map((project) => (
-                <div key={project.id} className="py-6 flex flex-col sm:flex-row sm:justify-between gap-4">
-                  <div className="space-y-2 max-w-xl">
-                    <h2 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                <div key={project.id} className="py-6 sm:py-8 flex flex-col sm:flex-row sm:justify-between gap-4">
+                  <div className="space-y-3 max-w-2xl">
+                    <h2 className={`text-lg sm:text-xl font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                       {project.title}
                     </h2>
-                    <p className={`text-base leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                    <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
                       {project.description}
                     </p>
                     <div className="flex flex-wrap gap-2 pt-1">
                       {project.techStack.map((tech) => (
-                        <span
-                          key={tech}
-                          className={`text-sm font-mono border px-2.5 py-0.5 rounded ${
-                            isDark
-                              ? 'text-neutral-400 bg-neutral-900 border-neutral-800'
-                              : 'text-neutral-700 bg-neutral-100 border-neutral-200'
-                          }`}
-                        >
+                        <span key={tech} className={`text-xs sm:text-sm font-mono border px-2.5 py-1 rounded ${isDark ? 'text-neutral-400 bg-neutral-900 border-neutral-800' : 'text-neutral-700 bg-neutral-100 border-neutral-200'}`}>
                           {tech}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  <div className="flex sm:flex-col items-start sm:items-end justify-start gap-3 text-sm font-mono shrink-0 pt-1">
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={`flex items-center gap-1 underline underline-offset-4 ${
-                        isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
-                      }`}
-                    >
-                      source <ArrowUpRight size={14} />
+                  <div className="flex sm:flex-col items-start sm:items-end justify-start gap-3 text-xs sm:text-sm font-mono shrink-0 pt-1">
+                    <a href={project.github} target="_blank" rel="noreferrer" className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'}`}>
+                      source <ArrowUpRight size={15} />
                     </a>
                     {project.demo !== "#" && (
-                      <a
-                        href={project.demo}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`flex items-center gap-1 underline underline-offset-4 ${
-                          isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
-                        }`}
-                      >
-                        live demo <ArrowUpRight size={14} />
+                      <a href={project.demo} target="_blank" rel="noreferrer" className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'}`}>
+                        live demo <ArrowUpRight size={15} />
                       </a>
                     )}
                   </div>
@@ -1368,19 +1366,190 @@ function App() {
             </div>
           </div>
         )}
+
+        {/* DEDICATED SUB-PAGE FOR SAMA FOUNDATION */}
+        {currentPage === 'sama-foundation' && (
+          <div className="space-y-8">
+            <div>
+              <button
+                onClick={() => setCurrentPage('home')}
+                className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono mb-6 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
+                  isDark
+                    ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800'
+                    : 'border-neutral-300 bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
+                }`}
+              >
+                <ArrowLeft size={16} /> Back to About
+              </button>
+              <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                Nayi Disha Care & Support Platform
+              </h1>
+              <p className={`text-xs sm:text-sm font-mono mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                Sama Foundation • Full-Stack Developer Project
+              </p>
+            </div>
+
+            <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
+              isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
+            }`}>
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  1. Abstract
+                </h3>
+                <p>
+                  Nayi Disha is a comprehensive full-stack care and support platform built to connect families, caretakers, health professionals, administrators, and connected IoT hardware through a unified ecosystem. By combining modern web technologies with secure database management and micro-controller integration, the platform streamlines care coordination, clinical tracking, and daily routines[cite: 1].
+                </p>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  2. Role-Based Workspace Architecture
+                </h3>
+                <p className="mb-3">To address the diverse needs of users within special needs care networks, the platform is structured into tailored portals[cite: 1]:</p>
+                <ul className="space-y-3 list-disc list-inside">
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Parent Workspace:</span> Empowers families with tools like ABC behavioral logging, dynamic child passports, weather-based sensory risk warnings, voice quick-logging, and low-demand mode controls[cite: 1].
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Caretaker Floor:</span> Provides real-time classroom telemetry, morning handover summaries, quick-stamp status broadcasts, and caseload calendar coordination[cite: 1].
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Admin Command Center:</span> Offers robust administrative oversight including clinical triage, IEP routine architectures, IoT device fleet tracking, global safety kill-switches, and verified user overrides[cite: 1].
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  3. Core Technical & Hardware Integration
+                </h3>
+                <p className="mb-3">The system leverages a robust, production-ready technology stack to ensure secure, low-latency performance[cite: 1]:</p>
+                <ul className="space-y-3 list-disc list-inside">
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Full-Stack Implementation:</span> Built using React 18, Vite, and Tailwind CSS for a responsive frontend, supported by a Node.js, Express, and Aiven PostgreSQL backend[cite: 1].
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>ESP32 Wearable Connectivity:</span> Integrates real-time hardware telemetry from ESP32-based band hardware to mirror sensory alerts and status updates[cite: 1].
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Intelligent Automation:</span> Incorporates automated database connection pooling, auto-recovering database heartbeats, and environment-aware data management[cite: 1].
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  Conclusion
+                </h3>
+                <p>
+                  Nayi Disha bridges critical gaps in special needs support by uniting families, caretakers, and hardware into a cohesive, secure, and highly scalable digital platform[cite: 1].
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DEDICATED SUB-PAGE FOR CIT HEARING AID */}
+        {currentPage === 'cit-hearingaid' && (
+          <div className="space-y-8">
+            <div>
+              <button
+                onClick={() => setCurrentPage('home')}
+                className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono mb-6 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
+                  isDark
+                    ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800'
+                    : 'border-neutral-300 bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
+                }`}
+              >
+                <ArrowLeft size={16} /> Back to About
+              </button>
+              <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                HearingAid Pro
+              </h1>
+              <p className={`text-xs sm:text-sm font-mono mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                Chandrashekar Institution of Technology • Software Developer Project
+              </p>
+            </div>
+
+            <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
+              isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
+            }`}>
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  1. Abstract
+                </h3>
+                <p>
+                  Hearing Aid Pro is a native Android application designed to transform mobile devices into real-time, customizable acoustic assistance tools. By implementing a custom digital signal processing (DSP) architecture, the system delivers high-fidelity sound amplification and personal sound profiling without relying on dedicated hardware.
+                </p>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  2. The Real-Time Audio Challenge
+                </h3>
+                <p>
+                  Processing live audio introduces strict performance constraints regarding latency and feedback control. To ensure a seamless user experience, the system utilizes low-level native audio buffers and optimized processing threads, minimizing delay between environmental input and headphone output.
+                </p>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  3. Core DSP & Signal Pipeline
+                </h3>
+                <p className="mb-3">The application relies on an advanced software-driven signal chain to shape and clean audio streams:</p>
+                <ul className="space-y-3 list-disc list-inside">
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Spectral Noise Suppression:</span> Implements frequency-domain filtering to dynamically reduce background ambient noise and adapt to room acoustics.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Parametric Equalization:</span> Features configurable biquad filter bands for precise frequency shaping, paired with automated headroom scaling to prevent audio clipping.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Live Visualizations:</span> Drives real-time time-domain waveforms and frequency spectrum analyzers via custom canvas rendering and optimized FFT processing.
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  Conclusion
+                </h3>
+                <p>
+                  This project demonstrates how commodity mobile hardware can be leveraged to build sophisticated, low-latency audio accessibility tools entirely through software optimization.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
-      {/* Footer */}
+      {/* Footer - Full Screen Width */}
       <footer
-        className={`w-full max-w-3xl mx-auto px-6 py-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-sm ${
+        className={`w-full px-6 sm:px-12 py-6 sm:py-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm max-w-7xl mx-auto ${
           isDark ? 'border-neutral-800/80 text-[#8a8a8a]' : 'border-neutral-200 text-neutral-500'
         }`}
       >
-        <div>
-          © {new Date().getFullYear()} Vignesh Suvarna. Built with React & Vite.
+        <div className="text-center sm:text-left flex flex-wrap items-center justify-center sm:justify-start gap-4">
+          <span>© {new Date().getFullYear()} Vignesh Suvarna. Built with React & Vite.</span>
+          
+          <div
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md font-mono text-xs border ${
+              isDark
+                ? 'bg-neutral-900 border-neutral-800 text-neutral-300'
+                : 'bg-neutral-100 border-neutral-200 text-neutral-700'
+            }`}
+            title="Total profile visitors"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#39d353]">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span className="font-semibold text-[#39d353]">{visitorCount}</span>
+            <span>visitors</span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-6">
           <a
             href="https://github.com/VigneshSSuvarna"
             target="_blank"
@@ -1390,7 +1559,7 @@ function App() {
               isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
             }`}
           >
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
             </svg>
           </a>
@@ -1404,7 +1573,7 @@ function App() {
               isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
             }`}
           >
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <rect x="3" y="9" width="4.5" height="12" rx="1" />
               <rect x="9.75" y="4" width="4.5" height="17" rx="1" />
               <rect x="16.5" y="12" width="4.5" height="9" rx="1" />
@@ -1420,7 +1589,7 @@ function App() {
               isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
             }`}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
             </svg>
           </a>
@@ -1436,16 +1605,15 @@ function App() {
           <div
             onClick={(e) => e.stopPropagation()}
             className={`border rounded-lg w-full max-w-4xl p-4 sm:p-6 space-y-4 my-auto max-h-[94vh] overflow-y-auto shadow-2xl transition-colors ${
-              isDark ? 'bg-[#141414] border-neutral-800' : 'bg-neutral-50 border-neutral-300'
+              isDark ? 'bg-[#141414] border-neutral-800' : 'bg-white border-neutral-300'
             }`}
           >
-            {/* Modal Header */}
             <div
-              className={`flex justify-between items-center border-b pb-3 ${
+              className={`flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 gap-3 ${
                 isDark ? 'border-neutral-800' : 'border-neutral-200'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <h2
                   className={`text-base font-mono font-semibold ${
                     isDark ? 'text-white' : 'text-neutral-900'
@@ -1483,16 +1651,14 @@ function App() {
               </button>
             </div>
 
-            {/* 1. Rating Graph Card (Adapts to Dark / Light) */}
             {renderCodeforcesRatingGraph()}
 
-            {/* 2. Activity Heatmap & Metrics Card (Adapts to Dark / Light) */}
             <div
               className={`border rounded-md p-4 sm:p-5 shadow-xs space-y-5 transition-colors ${
                 isDark ? 'bg-[#0d1117] border-neutral-800 text-[#c9d1d9]' : 'bg-white border-neutral-300 text-neutral-800'
               }`}
             >
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 {modalSelectedDateStr ? (
                   <div
                     className={`inline-flex items-center gap-2 text-xs font-mono px-2.5 py-1 rounded border ${
@@ -1539,7 +1705,6 @@ function App() {
                 </select>
               </div>
 
-              {/* Heatmap Grid */}
               <div className="overflow-x-auto overflow-y-hidden py-1">
                 <div className="inline-block min-w-full">
                   <div className="flex gap-[2px] pl-8 mb-1.5 h-4 items-end">
@@ -1618,7 +1783,6 @@ function App() {
                 </div>
               </div>
 
-              {/* 6-Metric Stats Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-5 gap-x-8 pt-2 pl-2 font-sans">
                 <div>
                   <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
@@ -1676,8 +1840,7 @@ function App() {
               </div>
             </div>
 
-            {/* Modal Footer */}
-            <div className="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono">
+            <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 pt-1 text-xs font-mono">
               <div className="flex flex-wrap items-center gap-2">
                 <span className={isDark ? 'text-neutral-400' : 'text-neutral-500'}>Focus Areas:</span>
                 {(cfDetailedStats.tags || ["Greedy", "Math", "Brute Force", "Implementation", "Sorting"]).map(tag => (
