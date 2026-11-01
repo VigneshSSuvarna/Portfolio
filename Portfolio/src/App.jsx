@@ -1089,7 +1089,7 @@ function App() {
                       Vignesh Suvarna
                     </h1>
                     <p className={`text-sm sm:text-base font-medium mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
-                      B.E. Computer Science & Engineering @ Atria Institute of Technology[cite: 1]
+                      B.E. Computer Science & Engineering @ Atria Institute of Technology
                     </p>
                   </div>
                   <p className={`text-sm sm:text-lg leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
@@ -1125,15 +1125,15 @@ function App() {
               <ul className={`space-y-3 text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
                 <li className="flex items-start gap-3">
                   <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
-                  <span>I am a 3rd-year Computer Science & Engineering undergraduate[cite: 1].</span>
+                  <span>I am a 3rd-year Computer Science & Engineering undergraduate.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
-                  <span>Currently working on full-stack web architectures and applied AI systems, focusing on backend scalability, asynchronous processing, and intelligent document retrieval[cite: 1].</span>
+                  <span>Currently working on full-stack web architectures and applied AI systems, focusing on backend scalability, asynchronous processing, and intelligent document retrieval.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
-                  <span>Driven by clean system design, I enjoy translating complex real-world problems into reliable, low-latency, and production-ready software[cite: 1].</span>
+                  <span>Driven by clean system design, I enjoy translating complex real-world problems into reliable, low-latency, and production-ready software</span>
                 </li>
               </ul>
             </div>
@@ -1151,15 +1151,15 @@ function App() {
               <ul className={`space-y-3 text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
                 <li className="flex items-start gap-3">
                   <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
-                  <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>Competitive Programming:</strong> I actively practice algorithmic problem-solving on Codeforces, primarily writing solutions in C++ and Python[cite: 1].</span>
+                  <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>Competitive Programming:</strong> I actively practice algorithmic problem-solving on Codeforces, primarily writing solutions in C++ and Python.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
-                  <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>AI Architecture & Full-Stack Systems:</strong> Designing Retrieval-Augmented Generation (RAG) pipelines, working with vector embeddings, and deploying scalable backend infrastructure[cite: 1].</span>
+                  <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>AI Architecture & Full-Stack Systems:</strong> Designing Retrieval-Augmented Generation (RAG) pipelines, working with vector embeddings, and deploying scalable backend infrastructure.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
-                  <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>Beyond Coding:</strong> Exploring new AI capabilities, building accessible applications, and unwinding with video games[cite: 1].</span>
+                  <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>Beyond Coding:</strong> Exploring new AI capabilities, building accessible applications, and unwinding with video games.</span>
                 </li>
               </ul>
             </div>
