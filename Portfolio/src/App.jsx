@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, ArrowUpRight, Sun, Moon, Download } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { X, ArrowUpRight, Sun, Moon, Download, Calendar, RefreshCw } from 'lucide-react';
 
 const projectsData = [
   {
@@ -71,12 +71,208 @@ const skillsData = [
   }
 ];
 
+const INITIAL_CF_SUBMISSIONS = {
+  "2025-11-20": 2,
+  "2026-03-31": 1,
+  "2026-04-03": 2,
+  "2026-04-04": 2,
+  "2026-05-13": 2,
+  "2026-05-18": 2
+};
+
+const INITIAL_CF_RATING_HISTORY = [
+  {
+    contestId: 1,
+    contestName: "Codeforces Round (Div. 4)",
+    dateStr: "2025-11-20",
+    timestamp: new Date(2025, 10, 20).getTime(),
+    oldRating: 0,
+    newRating: 385
+  },
+  {
+    contestId: 2,
+    contestName: "Codeforces Round (Div. 3)",
+    dateStr: "2026-04-04",
+    timestamp: new Date(2026, 3, 4).getTime(),
+    oldRating: 385,
+    newRating: 581
+  }
+];
+
+function getOrdinalSuffix(day) {
+  if (day > 3 && day < 21) return 'th';
+  switch (day % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+}
+
+function formatDisplayDate(dateStr) {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const dateObj = new Date(year, month - 1, day);
+  const monthShort = dateObj.toLocaleString('en-US', { month: 'short' });
+  const weekdayShort = dateObj.toLocaleString('en-US', { weekday: 'short' });
+  return `${day}${getOrdinalSuffix(day)} ${monthShort} ${year} (${weekdayShort})`;
+}
+
+function toLocalDateKey(dateObj) {
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function parseLocalDateKey(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function computeMaxStreak(dateKeys) {
+  if (!dateKeys || dateKeys.length === 0) return 0;
+  const sorted = [...new Set(dateKeys)].sort();
+  let maxStreak = 1;
+  let currentStreak = 1;
+
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = parseLocalDateKey(sorted[i - 1]);
+    const curr = parseLocalDateKey(sorted[i]);
+    const diffDays = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
+    if (diffDays === 1) {
+      currentStreak++;
+      if (currentStreak > maxStreak) maxStreak = currentStreak;
+    } else if (diffDays > 1) {
+      currentStreak = 1;
+    }
+  }
+  return maxStreak;
+}
+
+function buildDynamicRatingTicks(startTime, endTime) {
+  const ticks = [];
+  const count = 9;
+  const padStart = startTime + (endTime - startTime) * 0.08;
+  const padEnd = endTime - (endTime - startTime) * 0.02;
+
+  for (let i = 0; i < count; i++) {
+    const t = padStart + ((padEnd - padStart) * i) / (count - 1);
+    const d = new Date(t);
+    const dayStr = String(d.getDate()).padStart(2, '0');
+    const monthStr = d.toLocaleString('en-US', { month: 'short' });
+    ticks.push({
+      labelTop: `${dayStr} ${monthStr}`,
+      labelBottom: String(d.getFullYear()),
+      time: t
+    });
+  }
+  return ticks;
+}
+
+function buildCalendarWeeks(yearFilter = 'rolling') {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let endDate = new Date(today);
+  let startDate;
+
+  if (yearFilter === 'rolling') {
+    const currentWeekSunday = new Date(today);
+    currentWeekSunday.setDate(today.getDate() - today.getDay());
+    currentWeekSunday.setHours(0, 0, 0, 0);
+
+    startDate = new Date(currentWeekSunday);
+    startDate.setDate(currentWeekSunday.getDate() - 52 * 7);
+  } else {
+    const yr = Number(yearFilter);
+    const jan1 = new Date(yr, 0, 1);
+    startDate = new Date(jan1);
+    startDate.setDate(jan1.getDate() - jan1.getDay());
+
+    const dec31 = new Date(yr, 11, 31);
+    endDate = dec31 > today ? new Date(today) : dec31;
+  }
+
+  const weeks = [];
+  let cursor = new Date(startDate);
+  let weekIdx = 0;
+  let lastLabeledWeekIdx = -10;
+
+  while (cursor <= endDate) {
+    const weekSunday = new Date(cursor);
+    const days = [];
+    let monthLabel = null;
+
+    for (let d = 0; d < 7; d++) {
+      const cellDate = new Date(weekSunday);
+      cellDate.setDate(weekSunday.getDate() + d);
+      cellDate.setHours(0, 0, 0, 0);
+
+      if (cellDate > endDate) {
+        break;
+      }
+
+      if (yearFilter !== 'rolling' && cellDate.getFullYear() !== Number(yearFilter)) {
+        days.push({
+          dateStr: toLocalDateKey(cellDate),
+          dateObj: cellDate,
+          dayOfWeek: d,
+          isPadding: true
+        });
+        continue;
+      }
+
+      const dateStr = toLocalDateKey(cellDate);
+
+      if (cellDate.getDate() === 1) {
+        monthLabel = cellDate.toLocaleString('en-US', { month: 'short' });
+        lastLabeledWeekIdx = weekIdx;
+      }
+
+      days.push({
+        dateStr,
+        dateObj: cellDate,
+        dayOfWeek: d,
+        isPadding: false
+      });
+    }
+
+    if (weekIdx === 0 && !monthLabel && days.length > 0) {
+      const firstActive = days.find(x => !x.isPadding) || days[0];
+      monthLabel = firstActive.dateObj.toLocaleString('en-US', { month: 'short' });
+      lastLabeledWeekIdx = 0;
+    } else if (monthLabel && weekIdx - lastLabeledWeekIdx < 2 && weekIdx !== lastLabeledWeekIdx) {
+      monthLabel = null;
+    }
+
+    if (days.length > 0) {
+      weeks.push({
+        weekIdx,
+        monthLabel,
+        days
+      });
+    }
+
+    cursor.setDate(cursor.getDate() + 7);
+    weekIdx++;
+  }
+
+  return weeks;
+}
+
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [activeHeatmap, setActiveHeatmap] = useState('github');
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
+  const [isSyncingCf, setIsSyncingCf] = useState(false);
 
-  // Dark & Light Mode State (Defaults to Dark)
+  const [selectedDateStr, setSelectedDateStr] = useState(null);
+  const [modalSelectedDateStr, setModalSelectedDateStr] = useState(null);
+  const [modalYearFilter, setModalYearFilter] = useState('rolling');
+  const [ratingFilter, setRatingFilter] = useState('rated');
+  const [zoomEnabled, setZoomEnabled] = useState(false);
+  const [hoveredContest, setHoveredContest] = useState(null);
+
   const [isDark, setIsDark] = useState(() => {
     const savedTheme = localStorage.getItem('portfolio_theme');
     return savedTheme ? savedTheme === 'dark' : true;
@@ -86,122 +282,686 @@ function App() {
     localStorage.setItem('portfolio_theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  // Codeforces API Dynamic States
-  const [cfSubmissions, setCfSubmissions] = useState({});
-  const [cfStats, setCfStats] = useState({ solved: 5, rating: 581 });
-  const [loadingCf, setLoadingCf] = useState(true);
+  const [ghContributions, setGhContributions] = useState(() => {
+    try {
+      const cached = localStorage.getItem('portfolio_gh_contrib');
+      return cached ? JSON.parse(cached) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [ghTotal, setGhTotal] = useState(() => {
+    try {
+      const cached = localStorage.getItem('portfolio_gh_total');
+      return cached ? Number(cached) : 0;
+    } catch {
+      return 0;
+    }
+  });
 
-  useEffect(() => {
+  const [cfSubmissions, setCfSubmissions] = useState(() => {
+    try {
+      const cached = localStorage.getItem('portfolio_cf_submissions');
+      return cached ? JSON.parse(cached) : INITIAL_CF_SUBMISSIONS;
+    } catch {
+      return INITIAL_CF_SUBMISSIONS;
+    }
+  });
+
+  const [cfDetailedStats, setCfDetailedStats] = useState(() => {
+    try {
+      const cached = localStorage.getItem('portfolio_cf_detailed');
+      return cached
+        ? JSON.parse(cached)
+        : {
+            rating: 581,
+            solvedAllTime: 5,
+            solvedLastYear: 5,
+            solvedLastMonth: 0,
+            streakMax: 2,
+            streakLastYear: 2,
+            streakLastMonth: 0,
+            tags: ["Greedy", "Math", "Brute Force", "Implementation", "Sorting"],
+            languages: "C++, Python"
+          };
+    } catch {
+      return {
+        rating: 581,
+        solvedAllTime: 5,
+        solvedLastYear: 5,
+        solvedLastMonth: 0,
+        streakMax: 2,
+        streakLastYear: 2,
+        streakLastMonth: 0,
+        tags: ["Greedy", "Math", "Brute Force", "Implementation", "Sorting"],
+        languages: "C++, Python"
+      };
+    }
+  });
+
+  const [cfRatingHistory, setCfRatingHistory] = useState(() => {
+    try {
+      const cached = localStorage.getItem('portfolio_cf_rating_history');
+      return cached ? JSON.parse(cached) : INITIAL_CF_RATING_HISTORY;
+    } catch {
+      return INITIAL_CF_RATING_HISTORY;
+    }
+  });
+
+  const syncLiveActivity = useCallback(async () => {
     const handle = "VigneshSSuvarna";
+    setIsSyncingCf(true);
 
-    async function fetchCodeforcesData() {
-      try {
-        const userRes = await fetch(`https://codeforces.com/api/user.info?handles=${handle}`);
-        const userData = await userRes.json();
-        if (userData.status === 'OK' && userData.result.length > 0) {
-          setCfStats(prev => ({ ...prev, rating: userData.result[0].rating || prev.rating }));
-        }
-
-        const subRes = await fetch(`https://codeforces.com/api/user.status?handle=${handle}&from=1&count=2000`);
-        const subData = await subRes.json();
-
-        if (subData.status === 'OK') {
-          const counts = {};
-          let solvedCount = 0;
-          const solvedProblems = new Set();
-
-          subData.result.forEach(sub => {
-            if (sub.verdict === 'OK') {
-              const subDate = new Date(sub.creationTimeSeconds * 1000);
-              const year = subDate.getFullYear();
-              const month = String(subDate.getMonth() + 1).padStart(2, '0');
-              const day = String(subDate.getDate()).padStart(2, '0');
-              const dateStr = `${year}-${month}-${day}`;
-
-              counts[dateStr] = (counts[dateStr] || 0) + 1;
-
-              const probKey = `${sub.problem.contestId}-${sub.problem.index}`;
-              if (!solvedProblems.has(probKey)) {
-                solvedProblems.add(probKey);
-                solvedCount++;
-              }
-            }
-          });
-
-          setCfSubmissions(counts);
-          setCfStats(prev => ({ ...prev, solved: solvedCount > 0 ? solvedCount : prev.solved }));
-        }
-      } catch (error) {
-        console.error("Error fetching Codeforces data:", error);
-      } finally {
-        setLoadingCf(false);
-      }
-    }
-
-    fetchCodeforcesData();
-  }, []);
-
-  const getDynamicMonths = (totalWeeks) => {
-    const months = [];
-    const today = new Date();
-    for (let i = totalWeeks - 1; i >= 0; i -= 4) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - (i * 7));
-      months.push(d.toLocaleString('default', { month: 'short' }));
-    }
-    return months;
-  };
-
-  const renderBoundedCalendar = (totalWeeks = 52) => {
-    const weeks = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const todayKey = toLocalDateKey(today);
 
-    for (let w = totalWeeks - 1; w >= 0; w--) {
-      const daysInWeek = [];
-      for (let d = 0; d < 7; d++) {
-        const dateObj = new Date(today);
-        dateObj.setDate(dateObj.getDate() - (w * 7 + (6 - d)));
-        dateObj.setHours(0, 0, 0, 0);
+    const oneYearAgo = new Date(today);
+    oneYearAgo.setFullYear(today.getFullYear() - 1);
+    const oneYearAgoKey = toLocalDateKey(oneYearAgo);
 
-        if (dateObj > today) {
-          break;
+    const oneMonthAgo = new Date(today);
+    oneMonthAgo.setDate(today.getDate() - 30);
+    const oneMonthAgoKey = toLocalDateKey(oneMonthAgo);
+
+    fetch(`https://github-contributions-api.jogruber.de/v4/${handle}?y=last`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.contributions)) {
+          const map = {};
+          let total = 0;
+          data.contributions.forEach(item => {
+            if (item.date <= todayKey) {
+              map[item.date] = item.count || 0;
+              total += item.count || 0;
+            }
+          });
+          setGhContributions(map);
+          setGhTotal(total);
+          localStorage.setItem('portfolio_gh_contrib', JSON.stringify(map));
+          localStorage.setItem('portfolio_gh_total', String(total));
         }
+      })
+      .catch(() => {});
 
-        const year = dateObj.getFullYear();
-        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-        const day = String(dateObj.getDate()).padStart(2, '0');
-        const dateStr = `${year}-${month}-${day}`;
+    try {
+      const [infoRes, statusRes, ratingRes] = await Promise.allSettled([
+        fetch(`https://codeforces.com/api/user.info?handles=${handle}`).then(r => r.json()),
+        fetch(`https://codeforces.com/api/user.status?handle=${handle}&from=1&count=5000`).then(r => r.json()),
+        fetch(`https://codeforces.com/api/user.rating?handle=${handle}`).then(r => r.json())
+      ]);
 
-        const count = cfSubmissions[dateStr] || 0;
-
-        let colorClass = isDark ? "bg-[#161b22]" : "bg-[#ebedf0]";
-        if (count > 0) colorClass = isDark ? "bg-[#0e4429]" : "bg-[#9be9a8]";
-        if (count > 1) colorClass = isDark ? "bg-[#006d32]" : "bg-[#40c463]";
-        if (count >= 3) colorClass = isDark ? "bg-[#26a641]" : "bg-[#30a14e]";
-        if (count >= 5) colorClass = isDark ? "bg-[#39d353]" : "bg-[#216e39]";
-
-        daysInWeek.push(
-          <div
-            key={dateStr}
-            title={`${count} submissions on ${dateStr}`}
-            className={`w-[10px] h-[10px] rounded-[1px] ${colorClass}`}
-          />
-        );
+      let latestRating = 581;
+      if (
+        infoRes.status === 'fulfilled' &&
+        infoRes.value?.status === 'OK' &&
+        infoRes.value.result?.length > 0
+      ) {
+        latestRating = infoRes.value.result[0].rating || 581;
       }
 
-      if (daysInWeek.length > 0) {
-        weeks.push(
-          <div key={w} className="flex flex-col gap-[2px]">
-            {daysInWeek}
-          </div>
-        );
+      let firstAcceptedTimestamp = new Date(2025, 10, 20).getTime();
+
+      if (
+        statusRes.status === 'fulfilled' &&
+        statusRes.value?.status === 'OK' &&
+        Array.isArray(statusRes.value.result)
+      ) {
+        const counts = {};
+        const allTimeProbs = new Set();
+        const lastYearProbs = new Set();
+        const lastMonthProbs = new Set();
+        const tagCounts = {};
+        const langSet = new Set();
+
+        statusRes.value.result.forEach(sub => {
+          if (sub.verdict === 'OK') {
+            const ts = sub.creationTimeSeconds * 1000;
+            if (ts < firstAcceptedTimestamp) firstAcceptedTimestamp = ts;
+
+            const subDate = new Date(ts);
+            const dateStr = toLocalDateKey(subDate);
+
+            if (dateStr <= todayKey) {
+              counts[dateStr] = (counts[dateStr] || 0) + 1;
+              const probKey = `${sub.problem.contestId}-${sub.problem.index}`;
+              allTimeProbs.add(probKey);
+              if (dateStr >= oneYearAgoKey) lastYearProbs.add(probKey);
+              if (dateStr >= oneMonthAgoKey) lastMonthProbs.add(probKey);
+
+              if (Array.isArray(sub.problem.tags)) {
+                sub.problem.tags.forEach(t => {
+                  const formatted = t
+                    .split(' ')
+                    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+                    .join(' ');
+                  tagCounts[formatted] = (tagCounts[formatted] || 0) + 1;
+                });
+              }
+
+              if (sub.programmingLanguage) {
+                if (sub.programmingLanguage.includes('C++')) langSet.add('C++');
+                else if (sub.programmingLanguage.includes('Py')) langSet.add('Python');
+                else if (sub.programmingLanguage.includes('Java')) langSet.add('Java');
+              }
+            }
+          }
+        });
+
+        if (Object.keys(counts).length > 0) {
+          const activeDatesAll = Object.keys(counts);
+          const activeDatesYear = activeDatesAll.filter(d => d >= oneYearAgoKey);
+          const activeDatesMonth = activeDatesAll.filter(d => d >= oneMonthAgoKey);
+
+          const topTags = Object.entries(tagCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 6)
+            .map(([tag]) => tag);
+
+          const updatedStats = {
+            rating: latestRating,
+            solvedAllTime: allTimeProbs.size,
+            solvedLastYear: lastYearProbs.size,
+            solvedLastMonth: lastMonthProbs.size,
+            streakMax: computeMaxStreak(activeDatesAll),
+            streakLastYear: computeMaxStreak(activeDatesYear),
+            streakLastMonth: computeMaxStreak(activeDatesMonth),
+            tags: topTags.length > 0 ? topTags : ["Greedy", "Math", "Brute Force", "Implementation", "Sorting"],
+            languages: langSet.size > 0 ? Array.from(langSet).join(', ') : "C++, Python"
+          };
+
+          setCfSubmissions(counts);
+          setCfDetailedStats(updatedStats);
+          localStorage.setItem('portfolio_cf_submissions', JSON.stringify(counts));
+          localStorage.setItem('portfolio_cf_detailed', JSON.stringify(updatedStats));
+        }
       }
+
+      if (
+        ratingRes.status === 'fulfilled' &&
+        ratingRes.value?.status === 'OK' &&
+        Array.isArray(ratingRes.value.result) &&
+        ratingRes.value.result.length > 0
+      ) {
+        const rawContests = ratingRes.value.result.map(item => {
+          const d = new Date(item.ratingUpdateTimeSeconds * 1000);
+          return {
+            contestId: item.contestId,
+            contestName: item.contestName,
+            dateStr: toLocalDateKey(d),
+            timestamp: d.getTime(),
+            oldRating: item.oldRating,
+            newRating: item.newRating
+          };
+        });
+
+        const history =
+          rawContests.length === 1
+            ? [
+                {
+                  contestId: 0,
+                  contestName: "Initial Baseline",
+                  dateStr: toLocalDateKey(new Date(firstAcceptedTimestamp)),
+                  timestamp: firstAcceptedTimestamp,
+                  oldRating: 0,
+                  newRating: rawContests[0].oldRating || 385
+                },
+                ...rawContests
+              ]
+            : rawContests;
+
+        setCfRatingHistory(history);
+        localStorage.setItem('portfolio_cf_rating_history', JSON.stringify(history));
+      }
+    } catch {
+      // Retain cache if offline
+    } finally {
+      setIsSyncingCf(false);
     }
-    return weeks;
+  }, []);
+
+  useEffect(() => {
+    syncLiveActivity();
+    const interval = setInterval(syncLiveActivity, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [syncLiveActivity]);
+
+  const mainCalendarWeeks = useMemo(() => buildCalendarWeeks('rolling'), []);
+  const modalCalendarWeeks = useMemo(
+    () => buildCalendarWeeks(modalYearFilter),
+    [modalYearFilter]
+  );
+
+  const getGitHubCellColor = (count) => {
+    if (count <= 0) return isDark ? "bg-[#161b22]" : "bg-[#ebedf0]";
+    if (count === 1) return isDark ? "bg-[#0e4429]" : "bg-[#9be9a8]";
+    if (count <= 3) return isDark ? "bg-[#006d32]" : "bg-[#40c463]";
+    if (count <= 5) return isDark ? "bg-[#26a641]" : "bg-[#30a14e]";
+    return isDark ? "bg-[#39d353]" : "bg-[#216e39]";
   };
 
-  const annualMonths = getDynamicMonths(52);
+  const getCfCellColor = (count) => {
+    if (count <= 0) return isDark ? "bg-[#161b22]" : "bg-[#ebedf0]";
+    if (count === 1) return isDark ? "bg-[#0e4429]" : "bg-[#85e89d]";
+    if (count === 2) return isDark ? "bg-[#006d32]" : "bg-[#34d058]";
+    if (count <= 4) return isDark ? "bg-[#26a641]" : "bg-[#28a745]";
+    return isDark ? "bg-[#39d353]" : "bg-[#22863a]";
+  };
+
+  const activeDataMap = activeHeatmap === 'github' ? ghContributions : cfSubmissions;
+  const unitLabel = activeHeatmap === 'github' ? 'contribution' : 'submission';
+  const selectedCount = selectedDateStr ? (activeDataMap[selectedDateStr] || 0) : 0;
+
+  const renderMainHeatmap = () => {
+    return (
+      <div className="space-y-3">
+        <div
+          className={`overflow-x-auto overflow-y-hidden pb-3 border-b ${
+            isDark ? 'border-neutral-800' : 'border-neutral-200'
+          }`}
+        >
+          <div className="pt-6">
+            <div className="flex gap-[2px] pl-7 mb-1.5 h-4 items-end">
+              {mainCalendarWeeks.map((week) => (
+                <div key={week.weekIdx} className="w-[10px] relative shrink-0">
+                  {week.monthLabel && (
+                    <span
+                      className={`absolute bottom-0 left-0 text-[10px] font-mono leading-none select-none ${
+                        isDark ? 'text-[#8b949e]' : 'text-neutral-500'
+                      }`}
+                    >
+                      {week.monthLabel}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-1.5 items-start">
+              <div
+                className={`flex flex-col gap-[2px] text-[10px] font-mono w-6 shrink-0 select-none ${
+                  isDark ? 'text-[#8b949e]' : 'text-neutral-500'
+                }`}
+              >
+                <span className="h-[10px] leading-[10px] opacity-0">Sun</span>
+                <span className="h-[10px] leading-[10px]">Mon</span>
+                <span className="h-[10px] leading-[10px] opacity-0">Tue</span>
+                <span className="h-[10px] leading-[10px]">Wed</span>
+                <span className="h-[10px] leading-[10px] opacity-0">Thu</span>
+                <span className="h-[10px] leading-[10px]">Fri</span>
+                <span className="h-[10px] leading-[10px] opacity-0">Sat</span>
+              </div>
+
+              <div className="flex gap-[2px]">
+                {mainCalendarWeeks.map((week) => (
+                  <div key={week.weekIdx} className="flex flex-col gap-[2px] w-[10px] shrink-0">
+                    {week.days.map((day) => {
+                      const count = activeDataMap[day.dateStr] || 0;
+                      const isSelected = selectedDateStr === day.dateStr;
+                      const colorClass = getGitHubCellColor(count);
+
+                      return (
+                        <div key={day.dateStr} className="relative">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSelectedDateStr(prev => (prev === day.dateStr ? null : day.dateStr))
+                            }
+                            aria-label={`${formatDisplayDate(day.dateStr)}: ${count} ${unitLabel}${count === 1 ? '' : 's'}`}
+                            title={`${formatDisplayDate(day.dateStr)} — ${count} ${unitLabel}${count === 1 ? '' : 's'}`}
+                            className={`block w-[10px] h-[10px] rounded-[2px] cursor-pointer transition-transform duration-150 focus:outline-none ${colorClass} ${
+                              isSelected
+                                ? isDark
+                                  ? 'ring-2 ring-white scale-125 z-20 relative'
+                                  : 'ring-2 ring-neutral-900 scale-125 z-20 relative'
+                                : 'hover:scale-125 hover:z-10'
+                            }`}
+                          />
+
+                          {isSelected && (
+                            <div
+                              className={`absolute bottom-full mb-2 z-30 px-2.5 py-1 rounded text-[11px] font-mono whitespace-nowrap shadow-lg pointer-events-none border ${
+                                week.weekIdx > 42
+                                  ? 'right-0'
+                                  : week.weekIdx < 8
+                                  ? 'left-0'
+                                  : 'left-1/2 -translate-x-1/2'
+                              } bg-neutral-900 text-white border-neutral-700`}
+                            >
+                              <span className="font-semibold">{formatDisplayDate(day.dateStr)}</span>
+                              <span className="text-neutral-400"> • </span>
+                              <span className="text-[#39d353]">
+                                {count} {unitLabel}{count === 1 ? '' : 's'}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap justify-between items-center gap-3 text-xs font-mono pt-1">
+          {selectedDateStr ? (
+            <div
+              className={`inline-flex items-center gap-2 px-2.5 py-1 rounded border ${
+                isDark
+                  ? 'bg-neutral-900/90 border-neutral-800 text-neutral-200'
+                  : 'bg-neutral-100 border-neutral-200 text-neutral-800'
+              }`}
+            >
+              <Calendar size={13} className="text-[#39d353] shrink-0" />
+              <span>
+                <strong className={isDark ? 'text-white' : 'text-black'}>
+                  {formatDisplayDate(selectedDateStr)}
+                </strong>
+                {' — '}
+                {selectedCount} {unitLabel}{selectedCount === 1 ? '' : 's'}
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedDateStr(null)}
+                aria-label="Clear selected date"
+                className="ml-1 text-neutral-500 hover:text-neutral-300 cursor-pointer"
+              >
+                <X size={13} />
+              </button>
+            </div>
+          ) : (
+            <div className={isDark ? 'text-[#8b949e]' : 'text-neutral-500'}>
+              Click any square to view its exact date
+            </div>
+          )}
+
+          <div className={`flex items-center gap-1.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+            <span>Less</span>
+            {[0, 1, 2, 4, 6].map((lvl) => (
+              <span
+                key={lvl}
+                className={`w-[10px] h-[10px] rounded-[2px] inline-block ${getGitHubCellColor(lvl)}`}
+              />
+            ))}
+            <span>More</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Dynamic Codeforces Rating Graph (Adapts to Dark / Light Mode)
+  const renderCodeforcesRatingGraph = () => {
+    const svgWidth = 760;
+    const svgHeight = 250;
+    const padLeft = 46;
+    const padRight = 14;
+    const padTop = 10;
+    const padBottom = 38;
+    const plotW = svgWidth - padLeft - padRight;
+    const plotH = svgHeight - padTop - padBottom;
+
+    const highestContestRating = Math.max(
+      ...cfRatingHistory.map(c => c.newRating || 581),
+      581
+    );
+
+    const minRating = zoomEnabled ? 300 : 250;
+    const maxRating = zoomEnabled
+      ? Math.max(1400, highestContestRating + 200)
+      : Math.max(2050, highestContestRating + 250);
+
+    const yForRating = (r) => {
+      const clamped = Math.max(minRating, Math.min(maxRating, r));
+      return padTop + plotH - ((clamped - minRating) / (maxRating - minRating)) * plotH;
+    };
+
+    const startTime =
+      cfRatingHistory.length > 0
+        ? cfRatingHistory[0].timestamp
+        : new Date(2025, 10, 20).getTime();
+    const endTime =
+      cfRatingHistory.length > 1
+        ? cfRatingHistory[cfRatingHistory.length - 1].timestamp
+        : new Date(2026, 3, 5).getTime();
+
+    const xForTime = (t) => {
+      const ratio = (t - startTime) / Math.max(1, endTime - startTime);
+      const clampedRatio = Math.max(0, Math.min(1, ratio));
+      return padLeft + clampedRatio * plotW;
+    };
+
+    const xTicks = buildDynamicRatingTicks(startTime, endTime);
+
+    // Dark mode tier bands vs Light mode tier bands
+    const bands = isDark
+      ? [
+          { low: minRating, high: 1200, color: "#1f242d" },
+          { low: 1200, high: 1400, color: "#0e3a20" },
+          { low: 1400, high: 1600, color: "#0e363a" },
+          { low: 1600, high: 1900, color: "#22254a" },
+          { low: 1900, high: maxRating, color: "#451c45" }
+        ]
+      : [
+          { low: minRating, high: 1200, color: "#cccccc" },
+          { low: 1200, high: 1400, color: "#77ff77" },
+          { low: 1400, high: 1600, color: "#77ddbb" },
+          { low: 1600, high: 1900, color: "#aaaaff" },
+          { low: 1900, high: maxRating, color: "#ff88ff" }
+        ];
+
+    const yTicks = zoomEnabled ? [400, 600, 800, 1000, 1200] : [1200, 1400, 1600, 1900];
+
+    const points = cfRatingHistory.map((pt, idx) => ({
+      ...pt,
+      x:
+        idx === 0
+          ? padLeft + 2
+          : idx === cfRatingHistory.length - 1
+          ? padLeft + plotW - 2
+          : xForTime(pt.timestamp),
+      y: yForRating(pt.newRating)
+    }));
+
+    const polylinePoints = points.map(p => `${p.x},${p.y}`).join(' ');
+
+    return (
+      <div
+        className={`border rounded-md p-3.5 shadow-xs transition-colors ${
+          isDark
+            ? 'bg-[#0d1117] border-neutral-800 text-[#c9d1d9]'
+            : 'bg-white border-neutral-300 text-neutral-800'
+        }`}
+      >
+        <div className="flex justify-between items-center mb-1.5 text-xs font-sans">
+          <span className={isDark ? 'text-neutral-400' : 'text-neutral-500'}>
+            Click on the graph to enable the zoom feature.
+          </span>
+          <select
+            value={ratingFilter}
+            onChange={(e) => setRatingFilter(e.target.value)}
+            className={`border rounded px-2 py-0.5 text-xs focus:outline-none cursor-pointer ${
+              isDark
+                ? 'bg-neutral-900 border-neutral-700 text-white'
+                : 'bg-white border-neutral-300 text-neutral-800'
+            }`}
+          >
+            <option value="rated">Only rated</option>
+            <option value="all">All contests</option>
+          </select>
+        </div>
+
+        <div className="relative">
+          <svg
+            viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+            onClick={() => setZoomEnabled(prev => !prev)}
+            className="w-full h-auto select-none cursor-pointer overflow-visible"
+          >
+            {bands.map((b, i) => {
+              if (b.high <= minRating || b.low >= maxRating) return null;
+              const yTop = yForRating(Math.min(maxRating, b.high));
+              const yBot = yForRating(Math.max(minRating, b.low));
+              return (
+                <rect
+                  key={i}
+                  x={padLeft}
+                  y={yTop}
+                  width={plotW}
+                  height={Math.max(0, yBot - yTop)}
+                  fill={b.color}
+                />
+              );
+            })}
+
+            {yTicks.map((val) => {
+              const y = yForRating(val);
+              return (
+                <g key={val}>
+                  <line
+                    x1={padLeft}
+                    y1={y}
+                    x2={padLeft + plotW}
+                    y2={y}
+                    stroke={isDark ? "#30363d" : "#999999"}
+                    strokeWidth="0.7"
+                    strokeOpacity="0.6"
+                  />
+                  <text
+                    x={padLeft - 6}
+                    y={y + 4}
+                    textAnchor="end"
+                    fontSize="11"
+                    fill={isDark ? "#8b949e" : "#4b5563"}
+                    fontFamily="sans-serif"
+                  >
+                    {val}
+                  </text>
+                </g>
+              );
+            })}
+
+            {xTicks.map((tick, idx) => {
+              const x = xForTime(tick.time);
+              return (
+                <g key={idx}>
+                  <line
+                    x1={x}
+                    y1={padTop}
+                    x2={x}
+                    y2={padTop + plotH}
+                    stroke={isDark ? "#30363d" : "#888888"}
+                    strokeWidth="0.7"
+                    strokeOpacity="0.55"
+                  />
+                  <text
+                    x={x}
+                    y={padTop + plotH + 15}
+                    textAnchor="middle"
+                    fontSize="11"
+                    fill={isDark ? "#8b949e" : "#4b5563"}
+                    fontFamily="sans-serif"
+                  >
+                    {tick.labelTop}
+                  </text>
+                  <text
+                    x={x}
+                    y={padTop + plotH + 29}
+                    textAnchor="middle"
+                    fontSize="11"
+                    fill={isDark ? "#8b949e" : "#4b5563"}
+                    fontFamily="sans-serif"
+                  >
+                    {tick.labelBottom}
+                  </text>
+                </g>
+              );
+            })}
+
+            <rect
+              x={padLeft}
+              y={padTop}
+              width={plotW}
+              height={plotH}
+              fill="none"
+              stroke={isDark ? "#30363d" : "#555555"}
+              strokeWidth="1.5"
+            />
+
+            <polyline
+              fill="none"
+              stroke="rgba(0,0,0,0.3)"
+              strokeWidth="3"
+              points={points.map(p => `${p.x},${p.y + 1.5}`).join(' ')}
+            />
+            <polyline
+              fill="none"
+              stroke="#eab308"
+              strokeWidth="2.4"
+              points={polylinePoints}
+            />
+
+            {points.map((pt, idx) => {
+              const isLast = idx === points.length - 1;
+              return (
+                <circle
+                  key={idx}
+                  cx={pt.x}
+                  cy={pt.y}
+                  r={isLast ? 4 : 3.5}
+                  fill={isDark ? "#161b22" : "#ffffff"}
+                  stroke={isLast ? "#ef4444" : "#eab308"}
+                  strokeWidth={isLast ? "2.2" : "1.8"}
+                  onMouseEnter={() => setHoveredContest(pt)}
+                  onMouseLeave={() => setHoveredContest(null)}
+                />
+              );
+            })}
+
+            <g transform={`translate(${padLeft + plotW - 122}, ${padTop + 6})`}>
+              <rect
+                x="0"
+                y="0"
+                width="116"
+                height="18"
+                fill={isDark ? "rgba(22, 27, 34, 0.9)" : "rgba(255,255,255,0.88)"}
+                stroke={isDark ? "#30363d" : "#d1d5db"}
+                strokeWidth="0.8"
+              />
+              <rect
+                x="4"
+                y="3.5"
+                width="12"
+                height="11"
+                fill="#eab308"
+                stroke="#ca8a04"
+                strokeWidth="0.7"
+              />
+              <text
+                x="20"
+                y="13"
+                fontSize="11"
+                fill={isDark ? "#c9d1d9" : "#374151"}
+                fontFamily="sans-serif"
+              >
+                VigneshSSuvarna
+              </text>
+            </g>
+          </svg>
+
+          {hoveredContest && (
+            <div className="absolute top-3 left-14 bg-neutral-900 text-white text-xs font-mono px-2.5 py-1.5 rounded shadow-md pointer-events-none z-20 border border-neutral-700">
+              <div className="font-semibold">{hoveredContest.contestName}</div>
+              <div className="text-neutral-300">
+                Rating: <span className="text-yellow-400 font-bold">{hoveredContest.newRating}</span> ({formatDisplayDate(hoveredContest.dateStr)})
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div
@@ -256,7 +1016,6 @@ function App() {
             projects
           </button>
 
-          {/* Theme Toggle Button */}
           <button
             onClick={() => setIsDark(!isDark)}
             aria-label="Toggle theme"
@@ -275,7 +1034,6 @@ function App() {
       <main className="w-full max-w-3xl mx-auto px-6 py-12 flex-1">
         {currentPage === 'home' && (
           <div className="space-y-12">
-            {/* Intro / Profile Header */}
             <section className="space-y-8">
               <div className="flex flex-col sm:flex-row sm:items-center gap-5">
                 <img
@@ -312,7 +1070,6 @@ function App() {
                 </div>
               </div>
 
-              {/* About Me Section */}
               <div className="space-y-3 pt-2">
                 <h2
                   className={`text-sm font-mono uppercase tracking-wider mb-3 ${
@@ -338,7 +1095,6 @@ function App() {
                 </ul>
               </div>
 
-              {/* Interests Section */}
               <div className="pt-2">
                 <h2
                   className={`text-sm font-mono uppercase tracking-wider mb-3 ${
@@ -368,7 +1124,7 @@ function App() {
                     <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                       Beyond Coding.
                     </span>{' '}
-                    Exploring new AI capabilities, building accessible applications, and unwinding with  video games.
+                    Exploring new AI capabilities, building accessible applications, and unwinding with video games.
                   </li>
                 </ul>
               </div>
@@ -418,100 +1174,79 @@ function App() {
                 </div>
               </div>
 
-              {activeHeatmap === 'github' ? (
-                <div
-                  className={`border rounded p-4 ${
-                    isDark ? 'border-neutral-800 bg-[#0d1117]' : 'border-neutral-200 bg-white'
-                  }`}
-                >
-                  <div className={`text-xs mb-3 font-mono ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
-                    github.com/VigneshSSuvarna
-                  </div>
-                  <div className="overflow-x-auto">
-                    <div className="min-w-[680px] py-1">
-                      <img
-                        src="https://ghchart.rshah.org/VigneshSSuvarna"
-                        alt="Vignesh's Github Contribution Graph"
-                        className="w-full"
-                        style={
-                          isDark
-                            ? { filter: 'invert(1) hue-rotate(180deg) saturate(1.5) brightness(1.2)' }
-                            : undefined
-                        }
-                      />
+              <div
+                className={`border rounded p-4 ${
+                  isDark
+                    ? 'border-neutral-800 bg-[#0d1117] text-[#c9d1d9]'
+                    : 'border-neutral-200 bg-white text-neutral-800'
+                }`}
+              >
+                {activeHeatmap === 'github' ? (
+                  <>
+                    <div className="flex justify-between items-center text-xs mb-1 font-mono">
+                      <a
+                        href="https://github.com/VigneshSSuvarna"
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`hover:underline ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}
+                      >
+                        github.com/VigneshSSuvarna
+                      </a>
+                      <span className={isDark ? 'text-[#8b949e]' : 'text-neutral-500'}>
+                        {ghTotal > 0 ? `${ghTotal} contributions • ` : ''}up to {formatDisplayDate(toLocalDateKey(new Date()))}
+                      </span>
                     </div>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className={`border rounded p-5 ${
-                    isDark
-                      ? 'border-neutral-800 bg-[#0d1117] text-[#c9d1d9]'
-                      : 'border-neutral-200 bg-white text-neutral-800'
-                  }`}
-                >
-                  {loadingCf ? (
-                    <div className="py-6 text-neutral-500 text-sm font-mono">
-                      Fetching Codeforces data...
+                    {renderMainHeatmap()}
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between items-center text-xs mb-1 font-mono">
+                      <a
+                        href="https://codeforces.com/profile/VigneshSSuvarna"
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`hover:underline ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}
+                      >
+                        codeforces.com/profile/VigneshSSuvarna
+                      </a>
+                      <span className={isDark ? 'text-[#8b949e]' : 'text-neutral-500'}>
+                        active up to {formatDisplayDate(toLocalDateKey(new Date()))}
+                      </span>
                     </div>
-                  ) : (
-                    <>
-                      <div
-                        className={`overflow-x-auto pb-4 border-b ${
-                          isDark ? 'border-neutral-800' : 'border-neutral-200'
+
+                    {renderMainHeatmap()}
+
+                    <div
+                      className={`flex flex-wrap justify-between items-center gap-4 pt-3.5 mt-3 border-t text-sm font-mono ${
+                        isDark ? 'border-neutral-800' : 'border-neutral-200'
+                      }`}
+                    >
+                      <div className="flex gap-6">
+                        <div>
+                          <span className="text-neutral-500">solved: </span>
+                          <span className={isDark ? 'text-white' : 'text-neutral-900'}>
+                            {cfDetailedStats.solvedAllTime}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-neutral-500">rating: </span>
+                          <span className={isDark ? 'text-white' : 'text-neutral-900'}>
+                            {cfDetailedStats.rating}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setShowAnalyticsModal(true)}
+                        className={`underline underline-offset-4 cursor-pointer ${
+                          isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
                         }`}
                       >
-                        <div className="min-w-[700px]">
-                          <div
-                            className={`flex justify-between text-xs mb-2 px-6 ${
-                              isDark ? 'text-[#8b949e]' : 'text-neutral-500'
-                            }`}
-                          >
-                            {annualMonths.map((m, idx) => (
-                              <span key={idx}>{m}</span>
-                            ))}
-                          </div>
-                          <div className="flex gap-2">
-                            <div
-                              className={`flex flex-col justify-between text-xs pr-2 py-1 h-[95px] ${
-                                isDark ? 'text-[#8b949e]' : 'text-neutral-500'
-                              }`}
-                            >
-                              <span>Mon</span>
-                              <span>Wed</span>
-                              <span>Fri</span>
-                            </div>
-                            <div className="flex gap-[2px] flex-1 justify-between">
-                              {renderBoundedCalendar(52)}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap justify-between items-center gap-4 pt-4 text-sm font-mono">
-                        <div className="flex gap-6">
-                          <div>
-                            <span className="text-neutral-500">solved: </span>
-                            <span className={isDark ? 'text-white' : 'text-neutral-900'}>{cfStats.solved}</span>
-                          </div>
-                          <div>
-                            <span className="text-neutral-500">rating: </span>
-                            <span className={isDark ? 'text-white' : 'text-neutral-900'}>{cfStats.rating}</span>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setShowAnalyticsModal(true)}
-                          className={`underline underline-offset-4 cursor-pointer ${
-                            isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
-                          }`}
-                        >
-                          detailed stats →
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
+                        detailed stats →
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </section>
 
             <hr className={isDark ? 'border-neutral-800/80' : 'border-neutral-200'} />
@@ -646,7 +1381,6 @@ function App() {
         </div>
 
         <div className="flex items-center gap-5">
-          {/* GitHub Icon */}
           <a
             href="https://github.com/VigneshSSuvarna"
             target="_blank"
@@ -661,7 +1395,6 @@ function App() {
             </svg>
           </a>
 
-          {/* Codeforces Bars Icon */}
           <a
             href="https://codeforces.com/profile/VigneshSSuvarna"
             target="_blank"
@@ -678,7 +1411,6 @@ function App() {
             </svg>
           </a>
 
-          {/* LinkedIn Icon */}
           <a
             href="https://linkedin.com"
             target="_blank"
@@ -695,29 +1427,55 @@ function App() {
         </div>
       </footer>
 
-      {/* Minimal Modal for Codeforces Stats */}
+      {/* Fully Theme-Adaptive Codeforces Analytics Modal */}
       {showAnalyticsModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-5 overflow-y-auto"
+          onClick={() => setShowAnalyticsModal(false)}
+        >
           <div
-            className={`border rounded-md w-full max-w-3xl p-6 space-y-6 ${
-              isDark ? 'bg-[#141414] border-neutral-800' : 'bg-white border-neutral-200'
+            onClick={(e) => e.stopPropagation()}
+            className={`border rounded-lg w-full max-w-4xl p-4 sm:p-6 space-y-4 my-auto max-h-[94vh] overflow-y-auto shadow-2xl transition-colors ${
+              isDark ? 'bg-[#141414] border-neutral-800' : 'bg-neutral-50 border-neutral-300'
             }`}
           >
+            {/* Modal Header */}
             <div
               className={`flex justify-between items-center border-b pb-3 ${
                 isDark ? 'border-neutral-800' : 'border-neutral-200'
               }`}
             >
-              <h2
-                className={`text-base font-mono font-semibold ${
-                  isDark ? 'text-white' : 'text-neutral-900'
-                }`}
-              >
-                codeforces_analytics
-              </h2>
+              <div className="flex items-center gap-3">
+                <h2
+                  className={`text-base font-mono font-semibold ${
+                    isDark ? 'text-white' : 'text-neutral-900'
+                  }`}
+                >
+                  codeforces_analytics
+                </h2>
+                <span
+                  className={`text-xs font-mono px-2 py-0.5 rounded ${
+                    isDark ? 'bg-neutral-800 text-neutral-300' : 'bg-neutral-200 text-neutral-700'
+                  }`}
+                >
+                  @VigneshSSuvarna
+                </span>
+                <button
+                  onClick={syncLiveActivity}
+                  title="Sync latest data from Codeforces API"
+                  className={`inline-flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded border cursor-pointer transition-colors ${
+                    isDark
+                      ? 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white'
+                      : 'border-neutral-300 bg-white text-neutral-600 hover:text-black'
+                  }`}
+                >
+                  <RefreshCw size={11} className={isSyncingCf ? 'animate-spin' : ''} />
+                  {isSyncingCf ? 'syncing' : 'live'}
+                </button>
+              </div>
               <button
                 onClick={() => setShowAnalyticsModal(false)}
-                className={`cursor-pointer ${
+                className={`cursor-pointer p-1 rounded ${
                   isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
                 }`}
               >
@@ -725,54 +1483,221 @@ function App() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm font-mono">
-              <div
-                className={`border p-3 rounded ${
-                  isDark ? 'border-neutral-800 bg-[#0d1117]' : 'border-neutral-200 bg-neutral-50'
-                }`}
-              >
-                <div className="text-xs text-neutral-500">Problems Solved</div>
-                <div className={`text-lg mt-1 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                  {cfStats.solved}
+            {/* 1. Rating Graph Card (Adapts to Dark / Light) */}
+            {renderCodeforcesRatingGraph()}
+
+            {/* 2. Activity Heatmap & Metrics Card (Adapts to Dark / Light) */}
+            <div
+              className={`border rounded-md p-4 sm:p-5 shadow-xs space-y-5 transition-colors ${
+                isDark ? 'bg-[#0d1117] border-neutral-800 text-[#c9d1d9]' : 'bg-white border-neutral-300 text-neutral-800'
+              }`}
+            >
+              <div className="flex justify-between items-center">
+                {modalSelectedDateStr ? (
+                  <div
+                    className={`inline-flex items-center gap-2 text-xs font-mono px-2.5 py-1 rounded border ${
+                      isDark
+                        ? 'bg-neutral-900 border-neutral-700 text-white'
+                        : 'bg-neutral-100 border-neutral-300 text-neutral-800'
+                    }`}
+                  >
+                    <Calendar size={13} className="text-[#39d353]" />
+                    <span>
+                      <strong>{formatDisplayDate(modalSelectedDateStr)}</strong> —{' '}
+                      {cfSubmissions[modalSelectedDateStr] || 0} submission
+                      {(cfSubmissions[modalSelectedDateStr] || 0) === 1 ? '' : 's'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setModalSelectedDateStr(null)}
+                      className="text-neutral-400 hover:text-white cursor-pointer"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <span className={`text-xs font-sans ${isDark ? 'text-neutral-400' : 'text-neutral-400'}`}>
+                    Click any box to inspect date
+                  </span>
+                )}
+
+                <select
+                  value={modalYearFilter}
+                  onChange={(e) => {
+                    setModalYearFilter(e.target.value);
+                    setModalSelectedDateStr(null);
+                  }}
+                  className={`border rounded px-2.5 py-1 text-xs focus:outline-none cursor-pointer ${
+                    isDark
+                      ? 'bg-neutral-900 border-neutral-700 text-white'
+                      : 'bg-white border-neutral-300 text-neutral-800'
+                  }`}
+                >
+                  <option value="rolling">Choose year</option>
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                </select>
+              </div>
+
+              {/* Heatmap Grid */}
+              <div className="overflow-x-auto overflow-y-hidden py-1">
+                <div className="inline-block min-w-full">
+                  <div className="flex gap-[2px] pl-8 mb-1.5 h-4 items-end">
+                    {modalCalendarWeeks.map((week) => (
+                      <div key={week.weekIdx} className="w-[11.5px] relative shrink-0">
+                        {week.monthLabel && (
+                          <span
+                            className={`absolute bottom-0 left-0 text-[11px] font-sans leading-none select-none ${
+                              isDark ? 'text-[#8b949e]' : 'text-neutral-500'
+                            }`}
+                          >
+                            {week.monthLabel}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2 items-start">
+                    <div
+                      className={`flex flex-col gap-[2px] text-[11px] font-sans w-6 shrink-0 select-none ${
+                        isDark ? 'text-[#8b949e]' : 'text-neutral-500'
+                      }`}
+                    >
+                      <span className="h-[11.5px] leading-[11.5px] opacity-0">Sun</span>
+                      <span className="h-[11.5px] leading-[11.5px]">Mon</span>
+                      <span className="h-[11.5px] leading-[11.5px] opacity-0">Tue</span>
+                      <span className="h-[11.5px] leading-[11.5px]">Wed</span>
+                      <span className="h-[11.5px] leading-[11.5px] opacity-0">Thu</span>
+                      <span className="h-[11.5px] leading-[11.5px]">Fri</span>
+                      <span className="h-[11.5px] leading-[11.5px] opacity-0">Sat</span>
+                    </div>
+
+                    <div className="flex gap-[2px]">
+                      {modalCalendarWeeks.map((week) => (
+                        <div key={week.weekIdx} className="flex flex-col gap-[2px] w-[11.5px] shrink-0">
+                          {week.days.map((day) => {
+                            if (day.isPadding) {
+                              return (
+                                <div
+                                  key={day.dateStr}
+                                  className="w-[11.5px] h-[11.5px] bg-transparent"
+                                />
+                              );
+                            }
+
+                            const count = cfSubmissions[day.dateStr] || 0;
+                            const isSelected = modalSelectedDateStr === day.dateStr;
+                            const colorClass = getCfCellColor(count);
+
+                            return (
+                              <div key={day.dateStr} className="relative">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setModalSelectedDateStr(prev =>
+                                      prev === day.dateStr ? null : day.dateStr
+                                    )
+                                  }
+                                  title={`${formatDisplayDate(day.dateStr)} — ${count} submission${count === 1 ? '' : 's'}`}
+                                  className={`block w-[11.5px] h-[11.5px] rounded-[1px] cursor-pointer transition-transform duration-100 focus:outline-none ${colorClass} ${
+                                    isSelected
+                                      ? isDark
+                                        ? 'ring-2 ring-white scale-125 z-20 relative'
+                                        : 'ring-2 ring-neutral-900 scale-125 z-20 relative'
+                                      : 'hover:scale-125 hover:z-10'
+                                  }`}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div
-                className={`border p-3 rounded ${
-                  isDark ? 'border-neutral-800 bg-[#0d1117]' : 'border-neutral-200 bg-neutral-50'
-                }`}
-              >
-                <div className="text-xs text-neutral-500">Current Rating</div>
-                <div className={`text-lg mt-1 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                  {cfStats.rating}
+
+              {/* 6-Metric Stats Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-5 gap-x-8 pt-2 pl-2 font-sans">
+                <div>
+                  <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                    {cfDetailedStats.solvedAllTime} problems
+                  </div>
+                  <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                    solved for all time
+                  </div>
                 </div>
-              </div>
-              <div
-                className={`border p-3 rounded col-span-2 sm:col-span-1 ${
-                  isDark ? 'border-neutral-800 bg-[#0d1117]' : 'border-neutral-200 bg-neutral-50'
-                }`}
-              >
-                <div className="text-xs text-neutral-500">Primary Languages</div>
-                <div className={`text-sm mt-1.5 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                  C++, Python
+
+                <div>
+                  <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                    {cfDetailedStats.solvedLastYear} problems
+                  </div>
+                  <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                    solved for the last year
+                  </div>
+                </div>
+
+                <div>
+                  <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                    {cfDetailedStats.solvedLastMonth} problems
+                  </div>
+                  <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                    solved for the last month
+                  </div>
+                </div>
+
+                <div>
+                  <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                    {cfDetailedStats.streakMax} days
+                  </div>
+                  <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                    in a row max.
+                  </div>
+                </div>
+
+                <div>
+                  <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                    {cfDetailedStats.streakLastYear} days
+                  </div>
+                  <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                    in a row for the last year
+                  </div>
+                </div>
+
+                <div>
+                  <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                    {cfDetailedStats.streakLastMonth} days
+                  </div>
+                  <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                    in a row for the last month
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div>
-              <div className="text-xs font-mono text-neutral-500 mb-2">Focus Areas</div>
-              <div className="flex flex-wrap gap-2">
-                {["Greedy", "Math", "Brute Force", "Implementation", "Sorting"].map(tag => (
+            {/* Modal Footer */}
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-1 text-xs font-mono">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={isDark ? 'text-neutral-400' : 'text-neutral-500'}>Focus Areas:</span>
+                {(cfDetailedStats.tags || ["Greedy", "Math", "Brute Force", "Implementation", "Sorting"]).map(tag => (
                   <span
                     key={tag}
-                    className={`px-2.5 py-1 border text-xs font-mono rounded ${
+                    className={`px-2 py-0.5 border rounded ${
                       isDark
                         ? 'bg-neutral-900 border-neutral-800 text-neutral-300'
-                        : 'bg-neutral-100 border-neutral-200 text-neutral-700'
+                        : 'bg-white border-neutral-300 text-neutral-700'
                     }`}
                   >
                     {tag}
                   </span>
                 ))}
+              </div>
+              <div className={isDark ? 'text-neutral-400' : 'text-neutral-600'}>
+                Primary Languages:{' '}
+                <span className={isDark ? 'text-white font-semibold' : 'text-black font-semibold'}>
+                  {cfDetailedStats.languages || "C++, Python"}
+                </span>
               </div>
             </div>
           </div>
