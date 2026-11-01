@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, ExternalLink, Code2, Trophy, X } from 'lucide-react';
+import { X, ArrowUpRight, Sun, Moon, Download } from 'lucide-react';
 
 const projectsData = [
   {
@@ -17,22 +17,57 @@ const projectsData = [
     techStack: ["Python", "LangChain", "PyPDF"],
     github: "https://github.com/VigneshSSuvarna/AI-PDF-CHATBOX.git",
     demo: "#"
-  }, 
+  },
   {
     id: 3,
-    title: "HireSphere & PlaceOS", 
-    description: "Full-stack platforms modernizing university placements, providing a unified workspace for students and administrators.", 
-    techStack: ["TypeScript", "React", "Express"], 
+    title: "HireSphere & PlaceOS",
+    description: "Full-stack platforms modernizing university placements, providing a unified workspace for students and administrators.",
+    techStack: ["TypeScript", "React", "Express"],
     github: "https://github.com/VigneshSSuvarna/HireSphere.git",
     demo: "#"
   },
   {
     id: 4,
-    title: "HERMES", 
-    description: "An asynchronous, voice-activated personal AI companion and desktop automation engine.", 
-    techStack: ["Python", "asyncio"], 
+    title: "HERMES",
+    description: "An asynchronous, voice-activated personal AI companion and desktop automation engine.",
+    techStack: ["Python", "asyncio"],
     github: "https://github.com/VigneshSSuvarna/HERMES.git",
     demo: "#"
+  },
+  {
+    id: 5,
+    title: "HearingAid",
+    description: "A Kotlin-based Android assistive audio application designed to amplify real-time sound and improve hearing accessibility.",
+    techStack: ["Kotlin", "Android"],
+    github: "https://github.com/VigneshSSuvarna/HearingAid.git",
+    demo: "#"
+  }
+];
+
+const skillsData = [
+  {
+    category: "Languages",
+    items: ["Python", "JavaScript", "TypeScript", "C++", "C", "Java", "Kotlin", "SQL"]
+  },
+  {
+    category: "Frontend",
+    items: ["React.js", "Vite", "Tailwind CSS", "HTML5", "CSS3", "Streamlit"]
+  },
+  {
+    category: "Backend & APIs",
+    items: ["Node.js", "Express.js", "REST APIs", "Python asyncio", "JDBC"]
+  },
+  {
+    category: "Databases",
+    items: ["PostgreSQL", "MySQL", "phpMyAdmin"]
+  },
+  {
+    category: "AI & Data",
+    items: ["RAG Architecture", "LangChain", "LLMs", "PyPDF", "Pandas"]
+  },
+  {
+    category: "Cloud & Tools",
+    items: ["Git", "GitHub", "Vercel", "Render", "Postman", "VS Code", "Android"]
   }
 ];
 
@@ -41,14 +76,23 @@ function App() {
   const [activeHeatmap, setActiveHeatmap] = useState('github');
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
 
+  // Dark & Light Mode State (Defaults to Dark)
+  const [isDark, setIsDark] = useState(() => {
+    const savedTheme = localStorage.getItem('portfolio_theme');
+    return savedTheme ? savedTheme === 'dark' : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('portfolio_theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
+
   // Codeforces API Dynamic States
   const [cfSubmissions, setCfSubmissions] = useState({});
   const [cfStats, setCfStats] = useState({ solved: 5, rating: 581 });
   const [loadingCf, setLoadingCf] = useState(true);
 
-  // Fetch Codeforces Submissions & Rating on Mount
   useEffect(() => {
-    const handle = "VigneshSSuvarna"; 
+    const handle = "VigneshSSuvarna";
 
     async function fetchCodeforcesData() {
       try {
@@ -60,7 +104,7 @@ function App() {
 
         const subRes = await fetch(`https://codeforces.com/api/user.status?handle=${handle}&from=1&count=2000`);
         const subData = await subRes.json();
-        
+
         if (subData.status === 'OK') {
           const counts = {};
           let solvedCount = 0;
@@ -75,7 +119,7 @@ function App() {
               const dateStr = `${year}-${month}-${day}`;
 
               counts[dateStr] = (counts[dateStr] || 0) + 1;
-              
+
               const probKey = `${sub.problem.contestId}-${sub.problem.index}`;
               if (!solvedProblems.has(probKey)) {
                 solvedProblems.add(probKey);
@@ -97,7 +141,6 @@ function App() {
     fetchCodeforcesData();
   }, []);
 
-  // Dynamically compute active month labels ending at current date
   const getDynamicMonths = (totalWeeks) => {
     const months = [];
     const today = new Date();
@@ -109,12 +152,11 @@ function App() {
     return months;
   };
 
-  // Generate Codeforces exact dark-theme calendar
   const renderBoundedCalendar = (totalWeeks = 52) => {
     const weeks = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     for (let w = totalWeeks - 1; w >= 0; w--) {
       const daysInWeek = [];
       for (let d = 0; d < 7; d++) {
@@ -122,7 +164,6 @@ function App() {
         dateObj.setDate(dateObj.getDate() - (w * 7 + (6 - d)));
         dateObj.setHours(0, 0, 0, 0);
 
-        // Strict boundary: stop rendering if date is in the future
         if (dateObj > today) {
           break;
         }
@@ -131,25 +172,24 @@ function App() {
         const month = String(dateObj.getMonth() + 1).padStart(2, '0');
         const day = String(dateObj.getDate()).padStart(2, '0');
         const dateStr = `${year}-${month}-${day}`;
-        
+
         const count = cfSubmissions[dateStr] || 0;
-        
-        // Exact Codeforces Dark Theme Colors
-        let colorClass = "bg-[#161b22]";
-        if (count > 0) colorClass = "bg-[#0e4429]";
-        if (count > 1) colorClass = "bg-[#006d32]";
-        if (count >= 3) colorClass = "bg-[#26a641]";
-        if (count >= 5) colorClass = "bg-[#39d353]";
+
+        let colorClass = isDark ? "bg-[#161b22]" : "bg-[#ebedf0]";
+        if (count > 0) colorClass = isDark ? "bg-[#0e4429]" : "bg-[#9be9a8]";
+        if (count > 1) colorClass = isDark ? "bg-[#006d32]" : "bg-[#40c463]";
+        if (count >= 3) colorClass = isDark ? "bg-[#26a641]" : "bg-[#30a14e]";
+        if (count >= 5) colorClass = isDark ? "bg-[#39d353]" : "bg-[#216e39]";
 
         daysInWeek.push(
-          <div 
-            key={dateStr} 
+          <div
+            key={dateStr}
             title={`${count} submissions on ${dateStr}`}
-            className={`w-[11px] h-[11px] rounded-[1px] ${colorClass}`}
+            className={`w-[10px] h-[10px] rounded-[1px] ${colorClass}`}
           />
         );
       }
-      
+
       if (daysInWeek.length > 0) {
         weeks.push(
           <div key={w} className="flex flex-col gap-[2px]">
@@ -164,335 +204,427 @@ function App() {
   const annualMonths = getDynamicMonths(52);
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-neutral-100 font-sans selection:bg-blue-500/30 overflow-x-hidden">
-      
-      {/* Sleek Floating Navbar */}
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-2xl bg-neutral-900/80 backdrop-blur-xl border border-neutral-800 rounded-full px-6 py-3 flex justify-between items-center shadow-2xl transition-all duration-300">
-        <div className="font-bold tracking-wider text-white">VIGNESH.DEV</div>
-        <div className="flex gap-3 text-sm font-medium">
-          <button 
+    <div
+      className={`min-h-screen font-sans antialiased flex flex-col transition-colors duration-200 ${
+        isDark
+          ? 'bg-[#111111] text-[#e5e5e5] selection:bg-neutral-700 selection:text-white'
+          : 'bg-[#fafafa] text-[#171717] selection:bg-neutral-200 selection:text-black'
+      }`}
+    >
+      {/* Top Header */}
+      <header
+        className={`w-full max-w-3xl mx-auto px-6 pt-10 pb-6 border-b flex justify-between items-center ${
+          isDark ? 'border-neutral-800/80' : 'border-neutral-200'
+        }`}
+      >
+        <button
+          onClick={() => setCurrentPage('home')}
+          className={`font-mono text-base font-semibold tracking-tight cursor-pointer transition-colors ${
+            isDark ? 'text-white hover:text-neutral-300' : 'text-neutral-900 hover:text-neutral-600'
+          }`}
+        >
+          vignesh suvarna
+        </button>
+
+        <nav className="flex items-center gap-6 text-base font-mono">
+          <button
             onClick={() => setCurrentPage('home')}
-            className={`px-4 py-1.5 rounded-full transition-all duration-300 ${currentPage === 'home' ? 'bg-white text-black font-semibold shadow-md scale-105' : 'text-neutral-400 hover:text-white hover:bg-neutral-800/50'}`}
+            className={`cursor-pointer transition-colors ${
+              currentPage === 'home'
+                ? isDark
+                  ? 'text-white underline underline-offset-4 decoration-neutral-400'
+                  : 'text-neutral-900 underline underline-offset-4 decoration-neutral-500'
+                : isDark
+                ? 'text-neutral-400 hover:text-neutral-200'
+                : 'text-neutral-500 hover:text-neutral-900'
+            }`}
           >
-            Home
+            about
           </button>
-          <button 
+          <button
             onClick={() => setCurrentPage('projects')}
-            className={`px-4 py-1.5 rounded-full transition-all duration-300 ${currentPage === 'projects' ? 'bg-white text-black font-semibold shadow-md scale-105' : 'text-neutral-400 hover:text-white hover:bg-neutral-800/50'}`}
+            className={`cursor-pointer transition-colors ${
+              currentPage === 'projects'
+                ? isDark
+                  ? 'text-white underline underline-offset-4 decoration-neutral-400'
+                  : 'text-neutral-900 underline underline-offset-4 decoration-neutral-500'
+                : isDark
+                ? 'text-neutral-400 hover:text-neutral-200'
+                : 'text-neutral-500 hover:text-neutral-900'
+            }`}
           >
-            Projects
+            projects
           </button>
-        </div>
-      </nav>
 
-      <main className="max-w-3xl mx-auto px-6 pt-32 pb-20 space-y-8">
-        
-        {/* PAGE 1: HOME */}
+          {/* Theme Toggle Button */}
+          <button
+            onClick={() => setIsDark(!isDark)}
+            aria-label="Toggle theme"
+            className={`p-1.5 rounded border cursor-pointer transition-colors ${
+              isDark
+                ? 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white hover:border-neutral-700'
+                : 'border-neutral-200 bg-white text-neutral-600 hover:text-neutral-900 hover:border-neutral-300'
+            }`}
+          >
+            {isDark ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
+        </nav>
+      </header>
+
+      {/* Main Content */}
+      <main className="w-full max-w-3xl mx-auto px-6 py-12 flex-1">
         {currentPage === 'home' && (
-          <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
-            
-            {/* Hero Card */}
-            <div className="bg-neutral-900/50 border border-neutral-800/80 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden backdrop-blur-sm transition-all duration-500 transform translate-y-0 opacity-100">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none transition-all duration-700 animate-pulse"></div>
-
-              <div className="flex flex-col items-center text-center relative z-10">
-                
-                <div className="w-32 h-32 md:w-36 md:h-36 rounded-full overflow-hidden border-2 border-blue-500/50 shadow-xl shadow-blue-500/10 mb-6 bg-neutral-800 transition-transform duration-500 hover:scale-105">
-                  <img 
-                    src="/profile.jpg" 
-                    alt="Vignesh Suvarna" 
-                    className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-110"
-                  />
+          <div className="space-y-12">
+            {/* Intro / Profile Header */}
+            <section className="space-y-8">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+                <img
+                  src="/profile.jpg"
+                  alt="Vignesh Suvarna"
+                  className={`w-24 h-24 rounded-lg object-cover border shrink-0 ${
+                    isDark ? 'border-neutral-800 bg-neutral-900' : 'border-neutral-200 bg-neutral-100'
+                  }`}
+                />
+                <div className="space-y-2">
+                  <h1
+                    className={`text-3xl font-bold tracking-tight leading-snug ${
+                      isDark ? 'text-white' : 'text-neutral-900'
+                    }`}
+                  >
+                    Vignesh Suvarna
+                  </h1>
+                  <p className={`text-base ${isDark ? 'text-[#a3a3a3]' : 'text-neutral-600'}`}>
+                    B.E. in Computer Science & Engineering @ Atria Institute of Technology
+                  </p>
+                  <div>
+                    <a
+                      href="/resume.pdf"
+                      download
+                      className={`inline-flex items-center gap-2 text-sm font-mono px-3.5 py-2 rounded border transition-colors ${
+                        isDark
+                          ? 'border-neutral-800 bg-neutral-900 text-neutral-200 hover:bg-neutral-800 hover:text-white'
+                          : 'border-neutral-200 bg-neutral-100 text-neutral-800 hover:bg-neutral-200 hover:text-black'
+                      }`}
+                    >
+                      <Download size={15} /> resume
+                    </a>
+                  </div>
                 </div>
-
-                <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-2">Vignesh Suvarna</h1>
-                <p className="text-sm md:text-base text-blue-400 font-medium mb-8">
-                  Hi, I'm a 3rd year B.E.(CSE) student @ Atria Institute of Technology.
-                </p>
-
-                {/* Bio Details Cards */}
-                <div className="space-y-4 text-neutral-300 text-sm md:text-base leading-relaxed text-left bg-neutral-950/40 border border-neutral-800/60 p-6 rounded-2xl mb-8 shadow-inner">
-                  <p className="transition-colors duration-200 hover:text-white">
-                    <strong className="text-white font-semibold">Full-Stack Developer</strong> focusing on scalable web architectures (Node.js, Express, React, PostgreSQL).
-                  </p>
-                  <p className="transition-colors duration-200 hover:text-white">
-                    <strong className="text-white font-semibold">AI Architecture enthusiast</strong> building Retrieval-Augmented Generation (RAG) tools and integrating OpenRouter APIs.
-                  </p>
-                  <p className="transition-colors duration-200 hover:text-white">
-                    Deeply interested in robust system design, building platforms like Nayi Disha and PlaceOS to solve real-world management problems. I build things for fun, optimize them for speed, and sometimes they end up being genuinely useful.
-                  </p>
-                  <p className="text-neutral-400 text-xs md:text-sm pt-2 border-t border-neutral-800/60 transition-colors duration-200 hover:text-neutral-300">
-                    Outside of academics, I'm usually deploying apps to Vercel and Render, exploring new AI capabilities, or watching movies and playing games. Currently balancing university, full-stack projects, and whatever else catches my interest.
-                  </p>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-wrap justify-center gap-4 w-full">
-                  <a href="https://github.com/VigneshSSuvarna" target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-neutral-800/80 border border-neutral-700 px-5 py-2.5 rounded-xl hover:bg-neutral-700 hover:scale-105 transition-all duration-300 text-sm font-medium shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-                    GitHub
-                  </a>
-                  <a href="/resume.pdf" download className="flex items-center gap-2 bg-neutral-800/80 border border-neutral-700 px-5 py-2.5 rounded-xl hover:bg-neutral-700 hover:scale-105 transition-all duration-300 text-sm font-medium shadow-sm">
-                    Resume
-                  </a>
-                  <a href="mailto:rajkamalpathak51@gmail.com" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg shadow-blue-600/20 text-sm font-medium">
-                    <Mail size={16} /> Contact Me
-                  </a>
-                </div>
-
               </div>
-            </div>
 
-            {/* GitHub Contributions & Codeforces Activity Tabbed Widget */}
-            <div className="bg-neutral-900/50 border border-neutral-800/80 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-sm">
-              <div className="flex gap-4 mb-6">
-                <button 
-                  onClick={() => setActiveHeatmap('github')}
-                  className={`px-4 py-2 rounded-full text-xs font-bold tracking-wide transition-all ${activeHeatmap === 'github' ? 'bg-white text-black shadow-md' : 'bg-neutral-800 text-neutral-400 hover:text-white'}`}
+              {/* About Me Section */}
+              <div className="space-y-3 pt-2">
+                <h2
+                  className={`text-sm font-mono uppercase tracking-wider mb-3 ${
+                    isDark ? 'text-neutral-400' : 'text-neutral-500'
+                  }`}
                 >
-                  GitHub Contributions
-                </button>
-                <button 
-                  onClick={() => setActiveHeatmap('codeforces')}
-                  className={`px-4 py-2 rounded-full text-xs font-bold tracking-wide transition-all ${activeHeatmap === 'codeforces' ? 'bg-white text-black shadow-md' : 'bg-neutral-800 text-neutral-400 hover:text-white'}`}
+                  Background
+                </h2>
+                <ul
+                  className={`space-y-3 list-disc list-inside text-base leading-relaxed ${
+                    isDark ? 'marker:text-neutral-600 text-neutral-300' : 'marker:text-neutral-400 text-neutral-700'
+                  }`}
                 >
-                  Codeforces Activity
-                </button>
+                  <li>
+                    I am a <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>3rd-year Computer Science & Engineering undergraduate</span>.
+                  </li>
+                  <li>
+                    Currently working on <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>full-stack web architectures and applied AI systems</span>, focusing on backend scalability, asynchronous processing, and intelligent document retrieval.
+                  </li>
+                  <li>
+                    Driven by <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>clean system design</span>, I enjoy translating complex real-world problems into reliable, low-latency, and production-ready software.
+                  </li>
+                </ul>
               </div>
 
-              <div className="w-full">
-                {activeHeatmap === 'github' ? (
-                  <div className="animate-[fadeIn_0.3s_ease-out]">
-                    <div className="flex justify-between items-center mb-2 px-1">
-                      <div className="text-sm font-normal text-[#c9d1d9]">
-                        203 contributions in the last year
-                      </div>
-                      <div className="text-xs text-[#8b949e] flex items-center gap-1 cursor-pointer hover:text-[#c9d1d9]">
-                        Contribution settings <span className="text-[8px]">▼</span>
-                      </div>
+              {/* Interests Section */}
+              <div className="pt-2">
+                <h2
+                  className={`text-sm font-mono uppercase tracking-wider mb-3 ${
+                    isDark ? 'text-neutral-400' : 'text-neutral-500'
+                  }`}
+                >
+                  Areas of Exploration:
+                </h2>
+                <ul
+                  className={`space-y-3 list-disc list-inside text-base leading-relaxed ${
+                    isDark ? 'marker:text-neutral-600 text-neutral-300' : 'marker:text-neutral-400 text-neutral-700'
+                  }`}
+                >
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                      Competitive Programming.
+                    </span>{' '}
+                    I actively practice algorithmic problem-solving on Codeforces, primarily writing solutions in C++ and Python.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                      AI Architecture & Full-Stack Systems.
+                    </span>{' '}
+                    Designing Retrieval-Augmented Generation (RAG) pipelines, working with vector embeddings, and deploying scalable backend infrastructure.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                      Beyond Coding.
+                    </span>{' '}
+                    Exploring new AI capabilities, building accessible applications, and unwinding with  video games.
+                  </li>
+                </ul>
+              </div>
+            </section>
+
+            <hr className={isDark ? 'border-neutral-800/80' : 'border-neutral-200'} />
+
+            {/* Activity Section */}
+            <section className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2
+                  className={`text-sm font-mono uppercase tracking-wider ${
+                    isDark ? 'text-neutral-400' : 'text-neutral-500'
+                  }`}
+                >
+                  Coding Activity
+                </h2>
+                <div className="flex gap-4 text-sm font-mono">
+                  <button
+                    onClick={() => setActiveHeatmap('github')}
+                    className={`cursor-pointer ${
+                      activeHeatmap === 'github'
+                        ? isDark
+                          ? 'text-white underline underline-offset-4'
+                          : 'text-neutral-900 underline underline-offset-4'
+                        : isDark
+                        ? 'text-neutral-500 hover:text-neutral-300'
+                        : 'text-neutral-400 hover:text-neutral-700'
+                    }`}
+                  >
+                    github
+                  </button>
+                  <button
+                    onClick={() => setActiveHeatmap('codeforces')}
+                    className={`cursor-pointer ${
+                      activeHeatmap === 'codeforces'
+                        ? isDark
+                          ? 'text-white underline underline-offset-4'
+                          : 'text-neutral-900 underline underline-offset-4'
+                        : isDark
+                        ? 'text-neutral-500 hover:text-neutral-300'
+                        : 'text-neutral-400 hover:text-neutral-700'
+                    }`}
+                  >
+                    codeforces
+                  </button>
+                </div>
+              </div>
+
+              {activeHeatmap === 'github' ? (
+                <div
+                  className={`border rounded p-4 ${
+                    isDark ? 'border-neutral-800 bg-[#0d1117]' : 'border-neutral-200 bg-white'
+                  }`}
+                >
+                  <div className={`text-xs mb-3 font-mono ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                    github.com/VigneshSSuvarna
+                  </div>
+                  <div className="overflow-x-auto">
+                    <div className="min-w-[680px] py-1">
+                      <img
+                        src="https://ghchart.rshah.org/VigneshSSuvarna"
+                        alt="Vignesh's Github Contribution Graph"
+                        className="w-full"
+                        style={
+                          isDark
+                            ? { filter: 'invert(1) hue-rotate(180deg) saturate(1.5) brightness(1.2)' }
+                            : undefined
+                        }
+                      />
                     </div>
-                    
-                    {/* Exact GitHub Profile Dark Container */}
-                    <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-5 font-sans">
-                      <div className="overflow-x-auto">
-                        <div className="min-w-[700px] flex justify-center py-2 relative">
-                          <img 
-                            src="https://ghchart.rshah.org/VigneshSSuvarna" 
-                            alt="Vignesh's Github Contribution Graph" 
-                            className="w-full"
-                            style={{ filter: 'invert(1) hue-rotate(180deg) saturate(1.5) brightness(1.2)' }}
-                          />
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className={`border rounded p-5 ${
+                    isDark
+                      ? 'border-neutral-800 bg-[#0d1117] text-[#c9d1d9]'
+                      : 'border-neutral-200 bg-white text-neutral-800'
+                  }`}
+                >
+                  {loadingCf ? (
+                    <div className="py-6 text-neutral-500 text-sm font-mono">
+                      Fetching Codeforces data...
+                    </div>
+                  ) : (
+                    <>
+                      <div
+                        className={`overflow-x-auto pb-4 border-b ${
+                          isDark ? 'border-neutral-800' : 'border-neutral-200'
+                        }`}
+                      >
+                        <div className="min-w-[700px]">
+                          <div
+                            className={`flex justify-between text-xs mb-2 px-6 ${
+                              isDark ? 'text-[#8b949e]' : 'text-neutral-500'
+                            }`}
+                          >
+                            {annualMonths.map((m, idx) => (
+                              <span key={idx}>{m}</span>
+                            ))}
+                          </div>
+                          <div className="flex gap-2">
+                            <div
+                              className={`flex flex-col justify-between text-xs pr-2 py-1 h-[95px] ${
+                                isDark ? 'text-[#8b949e]' : 'text-neutral-500'
+                              }`}
+                            >
+                              <span>Mon</span>
+                              <span>Wed</span>
+                              <span>Fri</span>
+                            </div>
+                            <div className="flex gap-[2px] flex-1 justify-between">
+                              {renderBoundedCalendar(52)}
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center text-[11px] text-[#8b949e] pt-2 mt-2">
-                        <span className="hover:text-[#58a6ff] cursor-pointer">Learn how we count contributions</span>
-                        <div className="flex items-center gap-[3px]">
-                          <span className="mr-1">Less</span>
-                          <div className="w-[10px] h-[10px] rounded-[2px] bg-[#161b22] border border-[#1b222c]"></div>
-                          <div className="w-[10px] h-[10px] rounded-[2px] bg-[#0e4429] border border-[#003d16]"></div>
-                          <div className="w-[10px] h-[10px] rounded-[2px] bg-[#006d32] border border-[#005224]"></div>
-                          <div className="w-[10px] h-[10px] rounded-[2px] bg-[#26a641] border border-[#1e8633]"></div>
-                          <div className="w-[10px] h-[10px] rounded-[2px] bg-[#39d353] border border-[#2ea043]"></div>
-                          <span className="ml-1">More</span>
+                      <div className="flex flex-wrap justify-between items-center gap-4 pt-4 text-sm font-mono">
+                        <div className="flex gap-6">
+                          <div>
+                            <span className="text-neutral-500">solved: </span>
+                            <span className={isDark ? 'text-white' : 'text-neutral-900'}>{cfStats.solved}</span>
+                          </div>
+                          <div>
+                            <span className="text-neutral-500">rating: </span>
+                            <span className={isDark ? 'text-white' : 'text-neutral-900'}>{cfStats.rating}</span>
+                          </div>
                         </div>
+                        <button
+                          onClick={() => setShowAnalyticsModal(true)}
+                          className={`underline underline-offset-4 cursor-pointer ${
+                            isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
+                          }`}
+                        >
+                          detailed stats →
+                        </button>
                       </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </section>
+
+            <hr className={isDark ? 'border-neutral-800/80' : 'border-neutral-200'} />
+
+            {/* Structured Technical Skills Section */}
+            <section className="space-y-4">
+              <h2
+                className={`text-sm font-mono uppercase tracking-wider ${
+                  isDark ? 'text-neutral-400' : 'text-neutral-500'
+                }`}
+              >
+                Technical Skills
+              </h2>
+              <div
+                className={`divide-y border-t border-b text-base ${
+                  isDark
+                    ? 'divide-neutral-800/70 border-neutral-800'
+                    : 'divide-neutral-200 border-neutral-200'
+                }`}
+              >
+                {skillsData.map((group) => (
+                  <div key={group.category} className="py-3.5 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                    <span className="text-neutral-500 font-mono text-sm sm:w-36 shrink-0">
+                      {group.category}
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {group.items.map((skill) => (
+                        <span
+                          key={skill}
+                          className={`text-sm font-mono border px-2.5 py-1 rounded ${
+                            isDark
+                              ? 'text-neutral-300 bg-neutral-900/90 border-neutral-800'
+                              : 'text-neutral-700 bg-neutral-100 border-neutral-200'
+                          }`}
+                        >
+                          {skill}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                ) : (
-                  <div className="animate-[fadeIn_0.3s_ease-out]">
-                    {loadingCf ? (
-                      <div className="text-center py-8 text-neutral-500 text-sm animate-pulse">Loading Codeforces Heatmap...</div>
-                    ) : (
-                      /* Exact Codeforces Dark Theme Container */
-                      <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-6 w-full font-sans shadow-sm text-[#c9d1d9]">
-                        <div className="flex justify-end items-center mb-6 text-[13px] text-[#c9d1d9] gap-2 font-normal">
-                          <span>What activity will be shown to other users:</span>
-                          <select className="border border-[#30363d] rounded-[3px] px-2 py-0.5 bg-[#161b22] text-[#c9d1d9] outline-none cursor-pointer"><option>All</option></select>
-                          <select className="border border-[#30363d] rounded-[3px] px-2 py-0.5 bg-[#161b22] text-[#c9d1d9] outline-none cursor-pointer"><option>Choose year</option></select>
-                        </div>
-
-                        <div className="overflow-x-auto pb-4 border-b border-[#30363d]/60">
-                          <div className="min-w-[750px]">
-                            {/* Months Header */}
-                            <div className="flex justify-between text-[11px] text-[#8b949e] mb-2 px-8">
-                              {annualMonths.map((m, idx) => (
-                                <span key={idx}>{m}</span>
-                              ))}
-                            </div>
-
-                            <div className="flex gap-2">
-                              {/* Weekday Labels */}
-                              <div className="flex flex-col justify-between text-[11px] text-[#8b949e] pr-2 py-1 h-[105px]">
-                                <span className="mt-0.5">Mon</span>
-                                <span className="mt-2.5">Wed</span>
-                                <span className="mt-2.5">Fri</span>
-                                <span className="mb-0.5"></span>
-                              </div>
-
-                              {/* Grid */}
-                              <div className="flex gap-[2px] flex-1 justify-between">
-                                {renderBoundedCalendar(52)}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Exact Stats Footer layout matching the image */}
-                        <div className="grid grid-cols-3 gap-y-8 mt-6 px-4">
-                          <div>
-                            <div className="text-[22px] text-white font-medium leading-tight">{cfStats.solved} problems</div>
-                            <div className="text-[12px] text-[#8b949e]">solved for all time</div>
-                          </div>
-                          <div>
-                            <div className="text-[22px] text-white font-medium leading-tight">{cfStats.solved} problems</div>
-                            <div className="text-[12px] text-[#8b949e]">solved for the last year</div>
-                          </div>
-                          <div>
-                            <div className="text-[22px] text-white font-medium leading-tight">0 problems</div>
-                            <div className="text-[12px] text-[#8b949e]">solved for the last month</div>
-                          </div>
-                          <div>
-                            <div className="text-[22px] text-white font-medium leading-tight">1 days</div>
-                            <div className="text-[12px] text-[#8b949e]">in a row max.</div>
-                          </div>
-                          <div>
-                            <div className="text-[22px] text-white font-medium leading-tight">1 days</div>
-                            <div className="text-[12px] text-[#8b949e]">in a row for the last year</div>
-                          </div>
-                          <div>
-                            <div className="text-[22px] text-white font-medium leading-tight">0 days</div>
-                            <div className="text-[12px] text-[#8b949e]">in a row for the last month</div>
-                          </div>
-                        </div>
-
-                        <div className="mt-6 flex justify-end">
-                           <button 
-                             onClick={() => setShowAnalyticsModal(true)}
-                             className="text-xs text-blue-400 hover:underline font-medium bg-transparent border-none cursor-pointer"
-                           >
-                             Expand Detailed Analytics →
-                           </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                ))}
               </div>
-            </div>
-
-            {/* Tech Stack Section */}
-            <div className="bg-neutral-900/50 border border-neutral-800/80 rounded-3xl p-8 shadow-xl backdrop-blur-sm">
-              <h2 className="text-xl font-bold text-white mb-6 tracking-tight">Tech Stack</h2>
-              
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xs font-semibold tracking-wider text-neutral-400 uppercase mb-3">Languages</h3>
-                  <div className="flex flex-wrap gap-2.5">
-                    {["C", "C++", "Python", "Java", "JavaScript", "HTML5", "CSS3"].map((lang) => (
-                      <span key={lang} className="px-4 py-2 bg-neutral-950 border border-neutral-800 text-neutral-200 text-sm rounded-full hover:border-neutral-600 transition-colors">
-                        {lang}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-xs font-semibold tracking-wider text-neutral-400 uppercase mb-3">Frontend</h3>
-                  <div className="flex flex-wrap gap-2.5">
-                    {["React.js", "Vite", "Streamlit", "Tkinter"].map((fe) => (
-                      <span key={fe} className="px-4 py-2 bg-neutral-950 border border-neutral-800 text-neutral-200 text-sm rounded-full hover:border-neutral-600 transition-colors">
-                        {fe}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-xs font-semibold tracking-wider text-neutral-400 uppercase mb-3">Backend & APIs</h3>
-                  <div className="flex flex-wrap gap-2.5">
-                    {["Node.js", "Express.js", "REST APIs", "JDBC"].map((be) => (
-                      <span key={be} className="px-4 py-2 bg-neutral-950 border border-neutral-800 text-neutral-200 text-sm rounded-full hover:border-neutral-600 transition-colors">
-                        {be}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-xs font-semibold tracking-wider text-neutral-400 uppercase mb-3">Databases</h3>
-                  <div className="flex flex-wrap gap-2.5">
-                    {["MySQL", "PostgreSQL", "SQL", "phpMyAdmin"].map((db) => (
-                      <span key={db} className="px-4 py-2 bg-neutral-950 border border-neutral-800 text-neutral-200 text-sm rounded-full hover:border-neutral-600 transition-colors">
-                        {db}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-xs font-semibold tracking-wider text-neutral-400 uppercase mb-3">AI & Data</h3>
-                  <div className="flex flex-wrap gap-2.5">
-                    {["LLMs", "RAG", "AI Applications", "Data Processing", "Pandas"].map((ai) => (
-                      <span key={ai} className="px-4 py-2 bg-neutral-950 border border-neutral-800 text-neutral-200 text-sm rounded-full hover:border-neutral-600 transition-colors">
-                        {ai}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-xs font-semibold tracking-wider text-neutral-400 uppercase mb-3">Developer Tools</h3>
-                  <div className="flex flex-wrap gap-2.5">
-                    {["Git", "GitHub", "VS Code", "Postman", "Vercel", "XAMPP"].map((tool) => (
-                      <span key={tool} className="px-4 py-2 bg-neutral-950 border border-neutral-800 text-neutral-200 text-sm rounded-full hover:border-neutral-600 transition-colors">
-                        {tool}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
+            </section>
           </div>
         )}
 
-        {/* PAGE 2: PROJECTS */}
+        {/* PROJECTS PAGE */}
         {currentPage === 'projects' && (
-          <div className="animate-[fadeIn_0.5s_ease-out]">
-            <header className="mb-8 text-center md:text-left">
-              <h2 className="text-3xl font-extrabold text-white mb-2 flex items-center justify-center md:justify-start gap-3">
-                <Code2 className="text-blue-500 animate-spin-slow" size={28} /> Featured Projects
-              </h2>
-              <p className="text-neutral-400 text-sm">A curated look at my full-stack web platforms and AI tools.</p>
-            </header>
+          <div className="space-y-8">
+            <div>
+              <h1
+                className={`text-2xl font-bold tracking-tight ${
+                  isDark ? 'text-white' : 'text-neutral-900'
+                }`}
+              >
+                Projects
+              </h1>
+              <p className={`text-base mt-1 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                Selected full-stack applications, AI systems, and tools I've built.
+              </p>
+            </div>
 
-            <div className="grid grid-cols-1 gap-4">
-              {projectsData.map((project, index) => (
-                <div 
-                  key={project.id} 
-                  className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-6 hover:border-neutral-600 hover:bg-neutral-900/80 hover:-translate-y-1 transition-all duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-md"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
-                    <p className="text-neutral-400 text-sm mb-4 leading-relaxed">{project.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {project.techStack.map(tech => (
-                        <span key={tech} className="px-2.5 py-0.5 bg-neutral-950 border border-neutral-800 text-neutral-300 text-xs font-medium rounded-md">
+            <div
+              className={`divide-y border-t border-b ${
+                isDark ? 'divide-neutral-800 border-neutral-800' : 'divide-neutral-200 border-neutral-200'
+              }`}
+            >
+              {projectsData.map((project) => (
+                <div key={project.id} className="py-6 flex flex-col sm:flex-row sm:justify-between gap-4">
+                  <div className="space-y-2 max-w-xl">
+                    <h2 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                      {project.title}
+                    </h2>
+                    <p className={`text-base leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {project.techStack.map((tech) => (
+                        <span
+                          key={tech}
+                          className={`text-sm font-mono border px-2.5 py-0.5 rounded ${
+                            isDark
+                              ? 'text-neutral-400 bg-neutral-900 border-neutral-800'
+                              : 'text-neutral-700 bg-neutral-100 border-neutral-200'
+                          }`}
+                        >
                           {tech}
                         </span>
                       ))}
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-3 w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-neutral-800">
-                    <a href={project.github} target="_blank" rel="noreferrer" className="flex-1 md:flex-initial text-xs bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 hover:scale-105 font-medium">
-                      Code
+
+                  <div className="flex sm:flex-col items-start sm:items-end justify-start gap-3 text-sm font-mono shrink-0 pt-1">
+                    <a
+                      href={project.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`flex items-center gap-1 underline underline-offset-4 ${
+                        isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
+                      }`}
+                    >
+                      source <ArrowUpRight size={14} />
                     </a>
                     {project.demo !== "#" && (
-                      <a href={project.demo} target="_blank" rel="noreferrer" className="flex-1 md:flex-initial text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 hover:scale-105 font-medium shadow-md shadow-blue-600/20">
-                        <ExternalLink size={14} /> Demo
+                      <a
+                        href={project.demo}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`flex items-center gap-1 underline underline-offset-4 ${
+                          isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'
+                        }`}
+                      >
+                        live demo <ArrowUpRight size={14} />
                       </a>
                     )}
                   </div>
@@ -501,100 +633,151 @@ function App() {
             </div>
           </div>
         )}
-
       </main>
 
-      {/* DETAILED ANALYTICS MODAL */}
+      {/* Footer */}
+      <footer
+        className={`w-full max-w-3xl mx-auto px-6 py-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-sm ${
+          isDark ? 'border-neutral-800/80 text-[#8a8a8a]' : 'border-neutral-200 text-neutral-500'
+        }`}
+      >
+        <div>
+          © {new Date().getFullYear()} Vignesh Suvarna. Built with React & Vite.
+        </div>
+
+        <div className="flex items-center gap-5">
+          {/* GitHub Icon */}
+          <a
+            href="https://github.com/VigneshSSuvarna"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub"
+            className={`transition-colors ${
+              isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+          </a>
+
+          {/* Codeforces Bars Icon */}
+          <a
+            href="https://codeforces.com/profile/VigneshSSuvarna"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Codeforces"
+            className={`transition-colors ${
+              isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="3" y="9" width="4.5" height="12" rx="1" />
+              <rect x="9.75" y="4" width="4.5" height="17" rx="1" />
+              <rect x="16.5" y="12" width="4.5" height="9" rx="1" />
+            </svg>
+          </a>
+
+          {/* LinkedIn Icon */}
+          <a
+            href="https://linkedin.com"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="LinkedIn"
+            className={`transition-colors ${
+              isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
+            }`}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+            </svg>
+          </a>
+        </div>
+      </footer>
+
+      {/* Minimal Modal for Codeforces Stats */}
       {showAnalyticsModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#0e0f14] border border-neutral-800 rounded-3xl w-full max-w-5xl p-6 md:p-8 relative shadow-2xl space-y-8 animate-[fadeIn_0.3s_ease-out] my-8">
-            
-            {/* Modal Header */}
-            <div className="flex justify-between items-center border-b border-neutral-800 pb-4">
-              <h2 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                Coding Activity Dashboard
+        <div className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+          <div
+            className={`border rounded-md w-full max-w-3xl p-6 space-y-6 ${
+              isDark ? 'bg-[#141414] border-neutral-800' : 'bg-white border-neutral-200'
+            }`}
+          >
+            <div
+              className={`flex justify-between items-center border-b pb-3 ${
+                isDark ? 'border-neutral-800' : 'border-neutral-200'
+              }`}
+            >
+              <h2
+                className={`text-base font-mono font-semibold ${
+                  isDark ? 'text-white' : 'text-neutral-900'
+                }`}
+              >
+                codeforces_analytics
               </h2>
-              <button 
+              <button
                 onClick={() => setShowAnalyticsModal(false)}
-                className="w-10 h-10 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+                className={`cursor-pointer ${
+                  isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
+                }`}
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
-            {/* Modal Section 1: Full Annual Codeforces Activity & Heatmap */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold text-white">
-                  CODEFORCES Activity — <span className="text-blue-400">{cfStats.solved} Problems Solved</span>
-                </h3>
-              </div>
-
-              {/* Ensure Modal Codeforces container stays dark */}
-              <div className="bg-[#0d1117] border border-[#30363d] rounded-xl p-6 shadow-lg overflow-x-auto">
-                <div className="min-w-[850px] flex justify-between text-[11px] text-[#8b949e] mb-2 px-8 font-medium">
-                  {annualMonths.map((m, idx) => (
-                    <span key={idx}>{m}</span>
-                  ))}
-                </div>
-                <div className="min-w-[850px] flex gap-2 justify-center">
-                  <div className="flex flex-col justify-between text-[11px] text-[#8b949e] py-1 h-[105px]">
-                    <span className="mt-0.5">Mon</span>
-                    <span className="mt-2.5">Wed</span>
-                    <span className="mt-2.5">Fri</span>
-                    <span className="mb-0.5"></span>
-                  </div>
-                  <div className="flex gap-[2px] flex-1 justify-between">
-                    {renderBoundedCalendar(52)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Section 2: Rating & Stats Overview */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold text-white">
-                CODEFORCES Rating: <span className="text-yellow-400">{cfStats.rating}</span>
-              </h3>
-              <p className="text-sm text-neutral-400">Current active competitive programming standing and rating progression.</p>
-              
-              <div className="bg-neutral-950/60 p-6 rounded-2xl border border-neutral-800 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-sm font-semibold text-white mb-2">Problem Ratings Distribution</h4>
-                  <div className="space-y-2 text-xs text-neutral-400">
-                    <div className="flex justify-between"><span>800 - 1000 Level</span><span className="text-white">Active</span></div>
-                    <div className="w-full bg-neutral-900 h-2 rounded-full overflow-hidden">
-                      <div className="bg-blue-500 h-full w-3/4"></div>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="text-sm font-semibold text-white mb-2">Problem Tags Mastery</h4>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {["Greedy", "Math", "Brute Force", "Implementation", "Sorting"].map(tag => (
-                      <span key={tag} className="px-2.5 py-1 bg-neutral-900 border border-neutral-800 text-neutral-300 text-xs rounded-lg">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Footer Close */}
-            <div className="flex justify-end pt-4 border-t border-neutral-800">
-              <button 
-                onClick={() => setShowAnalyticsModal(false)}
-                className="bg-neutral-800 hover:bg-neutral-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer"
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm font-mono">
+              <div
+                className={`border p-3 rounded ${
+                  isDark ? 'border-neutral-800 bg-[#0d1117]' : 'border-neutral-200 bg-neutral-50'
+                }`}
               >
-                Close Dashboard
-              </button>
+                <div className="text-xs text-neutral-500">Problems Solved</div>
+                <div className={`text-lg mt-1 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                  {cfStats.solved}
+                </div>
+              </div>
+              <div
+                className={`border p-3 rounded ${
+                  isDark ? 'border-neutral-800 bg-[#0d1117]' : 'border-neutral-200 bg-neutral-50'
+                }`}
+              >
+                <div className="text-xs text-neutral-500">Current Rating</div>
+                <div className={`text-lg mt-1 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                  {cfStats.rating}
+                </div>
+              </div>
+              <div
+                className={`border p-3 rounded col-span-2 sm:col-span-1 ${
+                  isDark ? 'border-neutral-800 bg-[#0d1117]' : 'border-neutral-200 bg-neutral-50'
+                }`}
+              >
+                <div className="text-xs text-neutral-500">Primary Languages</div>
+                <div className={`text-sm mt-1.5 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                  C++, Python
+                </div>
+              </div>
             </div>
 
+            <div>
+              <div className="text-xs font-mono text-neutral-500 mb-2">Focus Areas</div>
+              <div className="flex flex-wrap gap-2">
+                {["Greedy", "Math", "Brute Force", "Implementation", "Sorting"].map(tag => (
+                  <span
+                    key={tag}
+                    className={`px-2.5 py-1 border text-xs font-mono rounded ${
+                      isDark
+                        ? 'bg-neutral-900 border-neutral-800 text-neutral-300'
+                        : 'bg-neutral-100 border-neutral-200 text-neutral-700'
+                    }`}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }
