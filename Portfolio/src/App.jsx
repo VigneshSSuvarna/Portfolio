@@ -5,14 +5,16 @@ const projectsData = [
   {
     id: 1,
     title: "Nayi Disha Platform",
+    category: "Full-Stack Web App",
     description: "Full-stack web application with user authentication and database integration.",
     techStack: ["Node.js", "Express", "PostgreSQL", "React"],
-    github: "https://github.com/Nayi-Disha-Org/Nayi-Disha.git",
+    github: "https://nayi-disha-web.vercel.app/",
     demo: "https://nayi-disha.vercel.app"
   },
   {
     id: 2,
     title: "AI-PDF-CHATBOX",
+    category: "Applied AI",
     description: "High-performance RAG system designed to eliminate LLM hallucinations by grounding responses in private local documents.",
     techStack: ["Python", "LangChain", "PyPDF"],
     github: "https://github.com/VigneshSSuvarna/AI-PDF-CHATBOX.git",
@@ -21,6 +23,7 @@ const projectsData = [
   {
     id: 3,
     title: "HireSphere & PlaceOS",
+    category: "Full-Stack Web App",
     description: "Full-stack platforms modernizing university placements, providing a unified workspace for students and administrators.",
     techStack: ["TypeScript", "React", "Express"],
     github: "https://github.com/VigneshSSuvarna/HireSphere.git",
@@ -29,6 +32,7 @@ const projectsData = [
   {
     id: 4,
     title: "HERMES",
+    category: "Applied AI",
     description: "An asynchronous, voice-activated personal AI companion and desktop automation engine.",
     techStack: ["Python", "asyncio"],
     github: "https://github.com/VigneshSSuvarna/HERMES.git",
@@ -37,6 +41,7 @@ const projectsData = [
   {
     id: 5,
     title: "HearingAid",
+    category: "Android App",
     description: "A Kotlin-based Android assistive audio application designed to amplify real-time sound and improve hearing accessibility.",
     techStack: ["Kotlin", "Android"],
     github: "https://github.com/VigneshSSuvarna/HearingAid.git",
@@ -1332,13 +1337,27 @@ function App() {
               </p>
             </div>
 
-            <div className={`divide-y border-t border-b ${isDark ? 'divide-neutral-800 border-neutral-800' : 'divide-neutral-200 border-neutral-200'}`}>
+            <div className="flex flex-col gap-6">
               {projectsData.map((project) => (
-                <div key={project.id} className="py-6 sm:py-8 flex flex-col sm:flex-row sm:justify-between gap-4">
+                <div
+                  key={project.id}
+                  className={`p-6 sm:p-8 rounded-xl border transition-all flex flex-col sm:flex-row sm:justify-between gap-4 shadow-sm ${
+                    isDark
+                      ? 'bg-neutral-900/40 border-[#39d353] hover:shadow-[0_0_15px_rgba(57,211,83,0.15)]'
+                      : 'bg-white border-emerald-600 hover:shadow-md'
+                  }`}
+                >
                   <div className="space-y-3 max-w-2xl">
-                    <h2 className={`text-lg sm:text-xl font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                      {project.title}
-                    </h2>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h2 className={`text-lg sm:text-xl font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                        {project.title}
+                      </h2>
+                      {project.category && (
+                        <span className={`text-xs font-mono px-2.5 py-1 rounded bg-emerald-500/10 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                          {project.category}
+                        </span>
+                      )}
+                    </div>
                     <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
                       {project.description}
                     </p>
@@ -1356,7 +1375,7 @@ function App() {
                       source <ArrowUpRight size={15} />
                     </a>
                     {project.demo !== "#" && (
-                      <a href={project.demo} target="_blank" rel="noreferrer" className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'}`}>
+                      <a href={project.demo} target="_blank" rel="noreferrer" className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-[#39d353] hover:text-white' : 'text-emerald-600 hover:text-emerald-900'}`}>
                         live demo <ArrowUpRight size={15} />
                       </a>
                     )}
