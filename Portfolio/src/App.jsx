@@ -65,7 +65,7 @@ const experienceData = [
   },
   {
     id: 2,
-    organization: "Chandrashekar Institution of Technology",
+    organization: "Dr. S. R. Chandrasekhar Institute of Speech and Hearing",
     role: "Software Developer",
     description: "Building institutional management platforms to streamline academic administration, student workflows, and resource allocation.",
     projectTitle: "HearingAid Pro",
@@ -1244,7 +1244,7 @@ function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {experienceData.map((exp) => {
                   const isSama = exp.organization.includes("Sama Foundation");
-                  const isCit = exp.organization.includes("Chandrashekar Institution of Technology");
+                  const isCit = exp.organization.includes("Dr. S. R. Chandrasekhar Institute of Speech and Hearing");
                   return (
                     <div
                       key={exp.id}
@@ -1555,7 +1555,7 @@ function App() {
                 HearingAid Pro
               </h1>
               <p className={`text-xs sm:text-sm font-mono mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
-                Chandrashekar Institution of Technology • Software Developer Project
+                Dr. S. R. Chandrasekhar Institute of Speech and Hearing • Software Developer Project
               </p>
             </div>
 
