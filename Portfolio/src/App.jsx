@@ -10,7 +10,7 @@ const projectsData = [
     techStack: ["Node.js", "Express", "PostgreSQL", "React"],
     github: "https://github.com/Nayi-Disha-Org/Nayi-Disha.git",
     demo: "https://nayi-disha-web.vercel.app",
-    pageKey: "sama-foundation" // Links to your existing detailed page!
+    pageKey: "sama-foundation"
   },
   {
     id: 2,
@@ -50,7 +50,7 @@ const projectsData = [
     techStack: ["Kotlin", "Android"],
     github: "https://github.com/VigneshSSuvarna/HearingAid.git",
     demo: "#",
-    pageKey: "cit-hearingaid" // Links to your existing detailed page!
+    pageKey: "cit-hearingaid"
   }
 ];
 
@@ -291,12 +291,14 @@ function buildCalendarWeeks(yearFilter = 'rolling') {
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
-  const [previousPage, setPreviousPage] = useState('home'); 
+  const [previousPage, setPreviousPage] = useState('home');
   const [activeHeatmap, setActiveHeatmap] = useState('github');
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
   const [isSyncingCf, setIsSyncingCf] = useState(false);
 
   const [visitorCount, setVisitorCount] = useState(198);
+
+  const [preloaderStep, setPreloaderStep] = useState(1);
 
   useEffect(() => {
     try {
@@ -312,6 +314,18 @@ function App() {
     } catch {
       setVisitorCount(198);
     }
+  }, []);
+
+  useEffect(() => {
+    const timer1 = setTimeout(() => setPreloaderStep(2), 1500);
+    const timer2 = setTimeout(() => setPreloaderStep(3), 2500);
+    const timer3 = setTimeout(() => setPreloaderStep(4), 3300);
+    
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
   }, []);
 
   const [selectedDateStr, setSelectedDateStr] = useState(null);
@@ -1019,6 +1033,48 @@ function App() {
           : 'bg-[#fafafa] text-[#171717] selection:bg-neutral-200 selection:text-black'
       }`}
     >
+      {preloaderStep < 4 && (
+        <div
+          className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden transition-opacity duration-700 ease-in-out ${
+            isDark ? 'bg-[#111111]' : 'bg-[#fafafa]'
+          } ${preloaderStep === 3 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        >
+          <div
+            className={`absolute flex items-center gap-3 transition-all duration-500 ease-in-out ${
+              preloaderStep === 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+            }`}
+          >
+            <span className={`text-2xl sm:text-4xl animate-pulse ${isDark ? 'text-[#39d353]' : 'text-emerald-600'}`}>
+              {"<"}
+            </span>
+            <h1 className={`text-2xl sm:text-4xl font-mono font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+              Welcome to my portfolio
+            </h1>
+            <span className={`text-2xl sm:text-4xl animate-pulse ${isDark ? 'text-[#39d353]' : 'text-emerald-600'}`}>
+              {"/>"}
+            </span>
+          </div>
+
+          <div
+            className={`absolute flex justify-center items-center transition-all duration-[800ms] ease-in-out ${
+              preloaderStep === 1 
+                ? 'opacity-0 scale-50' 
+                : preloaderStep === 2
+                ? 'opacity-100 scale-100'
+                : 'opacity-0 scale-[5] blur-md'
+            }`}
+          >
+            <img
+              src="/logo-main.png" 
+              alt="VS Logo"
+              className={`w-48 sm:w-64 object-contain rounded-xl ${
+                isDark ? 'shadow-[0_0_50px_rgba(57,211,83,0.15)]' : 'shadow-xl'
+              }`}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Top Header */}
       <header
         className={`w-full px-6 sm:px-12 pt-8 sm:pt-10 pb-6 border-b flex justify-between items-center ${
@@ -1031,7 +1087,7 @@ function App() {
             isDark ? 'text-white hover:text-neutral-300' : 'text-neutral-900 hover:text-neutral-600'
           }`}
         >
-          vignesh suvarna
+          Vignesh S Suvarna
         </button>
 
         <nav className="flex items-center gap-6 sm:gap-8 text-sm sm:text-base font-mono">
@@ -1332,7 +1388,7 @@ function App() {
           </div>
         )}
 
-       {/* PROJECTS PAGE */}
+        {/* PROJECTS PAGE */}
         {currentPage === 'projects' && (
           <div className="space-y-8">
             <div>
@@ -1350,7 +1406,7 @@ function App() {
                   key={project.id}
                   onClick={() => {
                     if (project.pageKey) {
-                      setPreviousPage('projects'); // <-- Add this
+                      setPreviousPage('projects');
                       setCurrentPage(project.pageKey);
                     }
                   }}
@@ -1486,14 +1542,14 @@ function App() {
           <div className="space-y-8">
             <div>
               <button
-                onClick={() => setCurrentPage('projects')}
+                onClick={() => setCurrentPage(previousPage)}
                 className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono mb-6 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
                   isDark
                     ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800'
                     : 'border-neutral-300 bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
                 }`}
               >
-                <ArrowLeft size={16} /> Back to Projects
+                <ArrowLeft size={16} /> Back to {previousPage === 'home' ? 'About' : 'Projects'}
               </button>
               <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                 HearingAid Pro
@@ -1553,79 +1609,7 @@ function App() {
             </div>
           </div>
         )}
-
-        {/* DEDICATED SUB-PAGE FOR CIT HEARING AID */}
-        {currentPage === 'cit-hearingaid' && (
-          <div className="space-y-8">
-            <div>
-              <button
-                onClick={() => setCurrentPage('home')}
-                className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono mb-6 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
-                  isDark
-                    ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800'
-                    : 'border-neutral-300 bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
-                }`}
-              >
-                <ArrowLeft size={16} /> Back to About
-              </button>
-              <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                HearingAid Pro
-              </h1>
-              <p className={`text-xs sm:text-sm font-mono mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
-                Chandrashekar Institution of Technology • Software Developer Project
-              </p>
-            </div>
-
-            <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
-              isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
-            }`}>
-              <div>
-                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
-                  1. Abstract
-                </h3>
-                <p>
-                  Hearing Aid Pro is a native Android application designed to transform mobile devices into real-time, customizable acoustic assistance tools. By implementing a custom digital signal processing (DSP) architecture, the system delivers high-fidelity sound amplification and personal sound profiling without relying on dedicated hardware.
-                </p>
-              </div>
-
-              <div>
-                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
-                  2. The Real-Time Audio Challenge
-                </h3>
-                <p>
-                  Processing live audio introduces strict performance constraints regarding latency and feedback control. To ensure a seamless user experience, the system utilizes low-level native audio buffers and optimized processing threads, minimizing delay between environmental input and headphone output.
-                </p>
-              </div>
-
-              <div>
-                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
-                  3. Core DSP & Signal Pipeline
-                </h3>
-                <p className="mb-3">The application relies on an advanced software-driven signal chain to shape and clean audio streams:</p>
-                <ul className="space-y-3 list-disc list-inside">
-                  <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Spectral Noise Suppression:</span> Implements frequency-domain filtering to dynamically reduce background ambient noise and adapt to room acoustics.
-                  </li>
-                  <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Parametric Equalization:</span> Features configurable biquad filter bands for precise frequency shaping, paired with automated headroom scaling to prevent audio clipping.
-                  </li>
-                  <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Live Visualizations:</span> Drives real-time time-domain waveforms and frequency spectrum analyzers via custom canvas rendering and optimized FFT processing.
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
-                  Conclusion
-                </h3>
-                <p>
-                  This project demonstrates how commodity mobile hardware can be leveraged to build sophisticated, low-latency audio accessibility tools entirely through software optimization.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        
         {/* DEDICATED SUB-PAGE FOR AI-PDF-CHATBOX */}
         {currentPage === 'project-ai-chatbox' && (
           <div className="space-y-8">
@@ -1889,7 +1873,6 @@ function App() {
         </div>
       </footer>
 
-      {/* Fully Theme-Adaptive Codeforces Analytics Modal */}
       {showAnalyticsModal && (
         <div
           className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-5 overflow-y-auto"
