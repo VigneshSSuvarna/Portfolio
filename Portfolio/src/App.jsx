@@ -8,8 +8,9 @@ const projectsData = [
     category: "Full-Stack Web App",
     description: "Full-stack web application with user authentication and database integration.",
     techStack: ["Node.js", "Express", "PostgreSQL", "React"],
-    github: "https://nayi-disha-web.vercel.app/",
-    demo: "https://nayi-disha.vercel.app"
+    github: "https://github.com/Nayi-Disha-Org/Nayi-Disha.git",
+    demo: "https://nayi-disha-web.vercel.app",
+    pageKey: "sama-foundation" // Links to your existing detailed page!
   },
   {
     id: 2,
@@ -18,7 +19,8 @@ const projectsData = [
     description: "High-performance RAG system designed to eliminate LLM hallucinations by grounding responses in private local documents.",
     techStack: ["Python", "LangChain", "PyPDF"],
     github: "https://github.com/VigneshSSuvarna/AI-PDF-CHATBOX.git",
-    demo: "#"
+    demo: "#",
+    pageKey: "project-ai-chatbox"
   },
   {
     id: 3,
@@ -27,7 +29,8 @@ const projectsData = [
     description: "Full-stack platforms modernizing university placements, providing a unified workspace for students and administrators.",
     techStack: ["TypeScript", "React", "Express"],
     github: "https://github.com/VigneshSSuvarna/HireSphere.git",
-    demo: "#"
+    demo: "#",
+    pageKey: "project-hiresphere"
   },
   {
     id: 4,
@@ -36,7 +39,8 @@ const projectsData = [
     description: "An asynchronous, voice-activated personal AI companion and desktop automation engine.",
     techStack: ["Python", "asyncio"],
     github: "https://github.com/VigneshSSuvarna/HERMES.git",
-    demo: "#"
+    demo: "#",
+    pageKey: "project-hermes"
   },
   {
     id: 5,
@@ -45,7 +49,8 @@ const projectsData = [
     description: "A Kotlin-based Android assistive audio application designed to amplify real-time sound and improve hearing accessibility.",
     techStack: ["Kotlin", "Android"],
     github: "https://github.com/VigneshSSuvarna/HearingAid.git",
-    demo: "#"
+    demo: "#",
+    pageKey: "cit-hearingaid" // Links to your existing detailed page!
   }
 ];
 
@@ -286,6 +291,7 @@ function buildCalendarWeeks(yearFilter = 'rolling') {
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [previousPage, setPreviousPage] = useState('home'); 
   const [activeHeatmap, setActiveHeatmap] = useState('github');
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
   const [isSyncingCf, setIsSyncingCf] = useState(false);
@@ -1080,7 +1086,7 @@ function App() {
             <section className={`p-6 sm:p-10 rounded-2xl border transition-all shadow-sm ${
               isDark ? 'bg-neutral-900/40 border-neutral-800' : 'bg-white border-neutral-200'
             }`}>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
+              <div className="flex flex-col items-center text-center gap-6">
                 <img
                   src="/profile.jpg"
                   alt="Vignesh Suvarna"
@@ -1088,7 +1094,7 @@ function App() {
                     isDark ? 'border-neutral-700 bg-neutral-900' : 'border-neutral-200 bg-neutral-100'
                   }`}
                 />
-                <div className="space-y-3 w-full">
+                <div className="space-y-4 w-full max-w-2xl">
                   <div>
                     <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                       Vignesh Suvarna
@@ -1100,7 +1106,7 @@ function App() {
                   <p className={`text-sm sm:text-lg leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
                     Full-stack software architect & applied AI builder focused on backend scalability, asynchronous processing, and low-latency systems.
                   </p>
-                  <div className="pt-2">
+                  <div className="pt-2 flex justify-center">
                     <a
                       href="/resume.pdf"
                       download
@@ -1176,7 +1182,7 @@ function App() {
               <div className="flex items-center gap-2 mb-6">
                 <Code2 size={20} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
                 <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                  Experience & Ongoing Work
+                  Ongoing Work
                 </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1187,6 +1193,7 @@ function App() {
                     <div
                       key={exp.id}
                       onClick={() => {
+                        setPreviousPage('home'); 
                         if (isSama) setCurrentPage('sama-foundation');
                         if (isCit) setCurrentPage('cit-hearingaid');
                       }}
@@ -1325,7 +1332,7 @@ function App() {
           </div>
         )}
 
-        {/* PROJECTS PAGE */}
+       {/* PROJECTS PAGE */}
         {currentPage === 'projects' && (
           <div className="space-y-8">
             <div>
@@ -1341,7 +1348,13 @@ function App() {
               {projectsData.map((project) => (
                 <div
                   key={project.id}
-                  className={`p-6 sm:p-8 rounded-xl border transition-all flex flex-col sm:flex-row sm:justify-between gap-4 shadow-sm ${
+                  onClick={() => {
+                    if (project.pageKey) {
+                      setPreviousPage('projects'); // <-- Add this
+                      setCurrentPage(project.pageKey);
+                    }
+                  }}
+                  className={`p-6 sm:p-8 rounded-xl border transition-all flex flex-col sm:flex-row sm:justify-between gap-4 shadow-sm cursor-pointer group ${
                     isDark
                       ? 'bg-neutral-900/40 border-[#39d353] hover:shadow-[0_0_15px_rgba(57,211,83,0.15)]'
                       : 'bg-white border-emerald-600 hover:shadow-md'
@@ -1349,7 +1362,7 @@ function App() {
                 >
                   <div className="space-y-3 max-w-2xl">
                     <div className="flex items-center gap-3 flex-wrap">
-                      <h2 className={`text-lg sm:text-xl font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                      <h2 className={`text-lg sm:text-xl font-semibold group-hover:text-[#39d353] transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                         {project.title}
                       </h2>
                       {project.category && (
@@ -1371,11 +1384,11 @@ function App() {
                   </div>
 
                   <div className="flex sm:flex-col items-start sm:items-end justify-start gap-3 text-xs sm:text-sm font-mono shrink-0 pt-1">
-                    <a href={project.github} target="_blank" rel="noreferrer" className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'}`}>
+                    <a href={project.github} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'}`}>
                       source <ArrowUpRight size={15} />
                     </a>
                     {project.demo !== "#" && (
-                      <a href={project.demo} target="_blank" rel="noreferrer" className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-[#39d353] hover:text-white' : 'text-emerald-600 hover:text-emerald-900'}`}>
+                      <a href={project.demo} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-[#39d353] hover:text-white' : 'text-emerald-600 hover:text-emerald-900'}`}>
                         live demo <ArrowUpRight size={15} />
                       </a>
                     )}
@@ -1391,14 +1404,14 @@ function App() {
           <div className="space-y-8">
             <div>
               <button
-                onClick={() => setCurrentPage('home')}
+                onClick={() => setCurrentPage(previousPage)}
                 className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono mb-6 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
                   isDark
                     ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800'
                     : 'border-neutral-300 bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
                 }`}
               >
-                <ArrowLeft size={16} /> Back to About
+                <ArrowLeft size={16} /> Back to {previousPage === 'home' ? 'About' : 'Projects'}
               </button>
               <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                 Nayi Disha Care & Support Platform
@@ -1416,7 +1429,7 @@ function App() {
                   1. Abstract
                 </h3>
                 <p>
-                  Nayi Disha is a comprehensive full-stack care and support platform built to connect families, caretakers, health professionals, administrators, and connected IoT hardware through a unified ecosystem. By combining modern web technologies with secure database management and micro-controller integration, the platform streamlines care coordination, clinical tracking, and daily routines[cite: 1].
+                  Nayi Disha is a comprehensive full-stack care and support platform built to connect families, caretakers, health professionals, administrators, and connected IoT hardware through a unified ecosystem. By combining modern web technologies with secure database management and micro-controller integration, the platform streamlines care coordination, clinical tracking, and daily routines.
                 </p>
               </div>
 
@@ -1424,16 +1437,16 @@ function App() {
                 <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
                   2. Role-Based Workspace Architecture
                 </h3>
-                <p className="mb-3">To address the diverse needs of users within special needs care networks, the platform is structured into tailored portals[cite: 1]:</p>
+                <p className="mb-3">To address the diverse needs of users within special needs care networks, the platform is structured into tailored portals:</p>
                 <ul className="space-y-3 list-disc list-inside">
                   <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Parent Workspace:</span> Empowers families with tools like ABC behavioral logging, dynamic child passports, weather-based sensory risk warnings, voice quick-logging, and low-demand mode controls[cite: 1].
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Parent Workspace:</span> Empowers families with tools like ABC behavioral logging, dynamic child passports, weather-based sensory risk warnings, voice quick-logging, and low-demand mode controls.
                   </li>
                   <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Caretaker Floor:</span> Provides real-time classroom telemetry, morning handover summaries, quick-stamp status broadcasts, and caseload calendar coordination[cite: 1].
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Caretaker Floor:</span> Provides real-time classroom telemetry, morning handover summaries, quick-stamp status broadcasts, and caseload calendar coordination.
                   </li>
                   <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Admin Command Center:</span> Offers robust administrative oversight including clinical triage, IEP routine architectures, IoT device fleet tracking, global safety kill-switches, and verified user overrides[cite: 1].
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Admin Command Center:</span> Offers robust administrative oversight including clinical triage, IEP routine architectures, IoT device fleet tracking, global safety kill-switches, and verified user overrides.
                   </li>
                 </ul>
               </div>
@@ -1442,16 +1455,16 @@ function App() {
                 <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
                   3. Core Technical & Hardware Integration
                 </h3>
-                <p className="mb-3">The system leverages a robust, production-ready technology stack to ensure secure, low-latency performance[cite: 1]:</p>
+                <p className="mb-3">The system leverages a robust, production-ready technology stack to ensure secure, low-latency performance:</p>
                 <ul className="space-y-3 list-disc list-inside">
                   <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Full-Stack Implementation:</span> Built using React 18, Vite, and Tailwind CSS for a responsive frontend, supported by a Node.js, Express, and Aiven PostgreSQL backend[cite: 1].
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Full-Stack Implementation:</span> Built using React 18, Vite, and Tailwind CSS for a responsive frontend, supported by a Node.js, Express, and Aiven PostgreSQL backend.
                   </li>
                   <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>ESP32 Wearable Connectivity:</span> Integrates real-time hardware telemetry from ESP32-based band hardware to mirror sensory alerts and status updates[cite: 1].
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>ESP32 Wearable Connectivity:</span> Integrates real-time hardware telemetry from ESP32-based band hardware to mirror sensory alerts and status updates.
                   </li>
                   <li>
-                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Intelligent Automation:</span> Incorporates automated database connection pooling, auto-recovering database heartbeats, and environment-aware data management[cite: 1].
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Intelligent Automation:</span> Incorporates automated database connection pooling, auto-recovering database heartbeats, and environment-aware data management.
                   </li>
                 </ul>
               </div>
@@ -1461,7 +1474,80 @@ function App() {
                   Conclusion
                 </h3>
                 <p>
-                  Nayi Disha bridges critical gaps in special needs support by uniting families, caretakers, and hardware into a cohesive, secure, and highly scalable digital platform[cite: 1].
+                  Nayi Disha bridges critical gaps in special needs support by uniting families, caretakers, and hardware into a cohesive, secure, and highly scalable digital platform.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DEDICATED SUB-PAGE FOR CIT HEARING AID */}
+        {currentPage === 'cit-hearingaid' && (
+          <div className="space-y-8">
+            <div>
+              <button
+                onClick={() => setCurrentPage('projects')}
+                className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono mb-6 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
+                  isDark
+                    ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800'
+                    : 'border-neutral-300 bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
+                }`}
+              >
+                <ArrowLeft size={16} /> Back to Projects
+              </button>
+              <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                HearingAid Pro
+              </h1>
+              <p className={`text-xs sm:text-sm font-mono mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                Chandrashekar Institution of Technology • Software Developer Project
+              </p>
+            </div>
+
+            <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
+              isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
+            }`}>
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  1. Abstract
+                </h3>
+                <p>
+                  Hearing Aid Pro is a native Android application designed to transform mobile devices into real-time, customizable acoustic assistance tools. By implementing a custom digital signal processing (DSP) architecture, the system delivers high-fidelity sound amplification and personal sound profiling without relying on dedicated hardware.
+                </p>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  2. The Real-Time Audio Challenge
+                </h3>
+                <p>
+                  Processing live audio introduces strict performance constraints regarding latency and feedback control. To ensure a seamless user experience, the system utilizes low-level native audio buffers and optimized processing threads, minimizing delay between environmental input and headphone output.
+                </p>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  3. Core DSP & Signal Pipeline
+                </h3>
+                <p className="mb-3">The application relies on an advanced software-driven signal chain to shape and clean audio streams:</p>
+                <ul className="space-y-3 list-disc list-inside">
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Spectral Noise Suppression:</span> Implements frequency-domain filtering to dynamically reduce background ambient noise and adapt to room acoustics.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Parametric Equalization:</span> Features configurable biquad filter bands for precise frequency shaping, paired with automated headroom scaling to prevent audio clipping.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Live Visualizations:</span> Drives real-time time-domain waveforms and frequency spectrum analyzers via custom canvas rendering and optimized FFT processing.
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  Conclusion
+                </h3>
+                <p>
+                  This project demonstrates how commodity mobile hardware can be leveraged to build sophisticated, low-latency audio accessibility tools entirely through software optimization.
                 </p>
               </div>
             </div>
@@ -1535,6 +1621,194 @@ function App() {
                 </h3>
                 <p>
                   This project demonstrates how commodity mobile hardware can be leveraged to build sophisticated, low-latency audio accessibility tools entirely through software optimization.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* DEDICATED SUB-PAGE FOR AI-PDF-CHATBOX */}
+        {currentPage === 'project-ai-chatbox' && (
+          <div className="space-y-8">
+            <div>
+              <button
+                onClick={() => setCurrentPage('projects')}
+                className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono mb-6 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
+                  isDark
+                    ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800'
+                    : 'border-neutral-300 bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
+                }`}
+              >
+                <ArrowLeft size={16} /> Back to Projects
+              </button>
+              <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                AI-PDF-CHATBOX
+              </h1>
+              <p className={`text-xs sm:text-sm font-mono mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                Applied AI • Document Retrieval System
+              </p>
+            </div>
+
+            <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
+              isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
+            }`}>
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  1. Abstract
+                </h3>
+                <p>
+                  AI-PDF-CHATBOX is a high-performance Retrieval-Augmented Generation (RAG) system engineered to allow users to securely interact with their private local documents. By grounding the AI's knowledge exclusively in the provided text, the application effectively eliminates the risk of Large Language Model (LLM) hallucinations, ensuring all responses are factually accurate and strictly bound to the source material.
+                </p>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  2. Core System Architecture
+                </h3>
+                <p className="mb-3">To ensure high accuracy and rapid context retrieval, the system operates on a structured pipeline:</p>
+                <ul className="space-y-3 list-disc list-inside">
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Document Ingestion & Processing:</span> Extracts text securely from local PDFs and divides it into optimized semantic chunks for efficient vectorization.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Contextual Retrieval Engine:</span> Utilizes advanced embedding models to map user queries against the document space, retrieving only the most relevant text passages.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Grounded Generation:</span> Feeds the retrieved context into the LLM alongside strict prompt boundaries, forcing the model to synthesize answers solely from the retrieved data.
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  Conclusion
+                </h3>
+                <p>
+                  This project transforms static PDF files into intelligent, interactive knowledge bases, providing a reliable and secure tool for document analysis, research, and data extraction.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DEDICATED SUB-PAGE FOR HIRESPHERE & PLACEOS */}
+        {currentPage === 'project-hiresphere' && (
+          <div className="space-y-8">
+            <div>
+              <button
+                onClick={() => setCurrentPage('projects')}
+                className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono mb-6 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
+                  isDark
+                    ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800'
+                    : 'border-neutral-300 bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
+                }`}
+              >
+                <ArrowLeft size={16} /> Back to Projects
+              </button>
+              <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                HireSphere & PlaceOS
+              </h1>
+              <p className={`text-xs sm:text-sm font-mono mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                Full-Stack Web App • University Placements Platform
+              </p>
+            </div>
+
+            <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
+              isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
+            }`}>
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  1. Abstract
+                </h3>
+                <p>
+                  HireSphere and PlaceOS form a comprehensive full-stack ecosystem designed to modernize and streamline university campus placements. The platforms replace fragmented recruitment processes with a unified digital workspace, centralizing job applications, interview tracking, and administrative oversight into a single, cohesive environment.
+                </p>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  2. Role-Based Workspace Architecture
+                </h3>
+                <p className="mb-3">The system is divided into distinct operational workflows tailored to different stakeholders:</p>
+                <ul className="space-y-3 list-disc list-inside">
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Student Workspace:</span> Provides an interactive dashboard for students to build profiles, track coding practice progress, monitor ongoing job applications, and prepare for upcoming corporate drives.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Coordinator Workspace:</span> Equips university placement officers with robust tools to manage company profiles, schedule recruitment drives, broadcast updates, and analyze cohort placement metrics.
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  Conclusion
+                </h3>
+                <p>
+                  By creating a transparent and highly organized digital bridge between students and administrators, HireSphere and PlaceOS significantly reduce friction in the hiring pipeline, driving better placement outcomes and a smoother campus recruitment experience.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* DEDICATED SUB-PAGE FOR HERMES */}
+        {currentPage === 'project-hermes' && (
+          <div className="space-y-8">
+            <div>
+              <button
+                onClick={() => setCurrentPage('projects')}
+                className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono mb-6 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
+                  isDark
+                    ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800'
+                    : 'border-neutral-300 bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
+                }`}
+              >
+                <ArrowLeft size={16} /> Back to Projects
+              </button>
+              <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                HERMES
+              </h1>
+              <p className={`text-xs sm:text-sm font-mono mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                Applied AI • Desktop Automation Engine
+              </p>
+            </div>
+
+            <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
+              isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
+            }`}>
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  1. Abstract
+                </h3>
+                <p>
+                  HERMES is an intelligent, voice-activated personal AI companion engineered for localized desktop automation. Built heavily around asynchronous programming paradigms, it listens for verbal commands, processes natural language, and executes system-level tasks efficiently without freezing the main application thread.
+                </p>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  2. Core Technical Implementations
+                </h3>
+                <p className="mb-3">The engine leverages specialized libraries and concurrency patterns to achieve a seamless user experience:</p>
+                <ul className="space-y-3 list-disc list-inside">
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Asynchronous Event Loop:</span> Utilizes a non-blocking architecture to ensure that the engine can continuously listen for new inputs while simultaneously executing ongoing system commands or fetching data.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Speech-to-Action Pipeline:</span> Integrates offline speech recognition models to transcribe audio commands instantly, routing them through an intent parser to trigger specific desktop automations.
+                  </li>
+                  <li>
+                    <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>System Automation Integration:</span> Interfaces directly with the underlying operating system to manage files, launch applications, fetch information, and perform routine workflows hands-free.
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+                  Conclusion
+                </h3>
+                <p>
+                  HERMES demonstrates the power of combining AI with low-level system integration, offering a responsive, privacy-focused, and highly extensible virtual assistant tailored specifically for developer and desktop environments.
                 </p>
               </div>
             </div>
