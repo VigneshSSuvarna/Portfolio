@@ -2025,7 +2025,7 @@ function App() {
 
       {/* CTRL+K HINT (Floating bottom right) */}
       <div className="fixed bottom-6 right-6 hidden sm:flex items-center gap-2 pointer-events-none opacity-50 font-mono text-xs z-40">
-        <span className={isDark ? 'text-neutral-400' : 'text-neutral-500'}>Command Palette</span>
+        <span className={isDark ? 'text-neutral-400' : 'text-neutral-500'}>console</span>
         <kbd className={`px-2 py-1 rounded border flex items-center gap-1 ${isDark ? 'bg-neutral-900 border-neutral-700 text-neutral-300' : 'bg-white border-neutral-300 text-neutral-600'}`}>
           <Command size={10} /> K
         </kbd>
