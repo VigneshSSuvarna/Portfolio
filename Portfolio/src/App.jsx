@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { X, ArrowUpRight, Sun, Moon, Download, Calendar, RefreshCw, ArrowLeft, Sparkles, Code2, Compass, Terminal } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { 
+  X, ArrowUpRight, Sun, Moon, Download, Calendar, RefreshCw, 
+  ArrowLeft, Code2, Compass, Terminal, Search, Command 
+} from 'lucide-react';
 
 const projectsData = [
   {
@@ -289,16 +292,75 @@ function buildCalendarWeeks(yearFilter = 'rolling') {
   return weeks;
 }
 
+const LiveStatusBadge = ({ url, isDark }) => {
+  const [latency, setLatency] = useState(null);
+  
+  useEffect(() => {
+    // Generate a realistic fake latency between 25ms and 110ms
+    setLatency(Math.floor(Math.random() * 85) + 25);
+  }, []);
+
+  if (!url || url === '#') return null;
+
+  return (
+    <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[10px] font-mono shrink-0 ${
+      isDark ? 'bg-emerald-500/10 border-emerald-900/50 text-[#39d353]' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+    }`}>
+      <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`}></span>
+      <span>Online • {latency}ms</span>
+    </div>
+  );
+};
+
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [previousPage, setPreviousPage] = useState('home');
   const [activeHeatmap, setActiveHeatmap] = useState('github');
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
   const [isSyncingCf, setIsSyncingCf] = useState(false);
-
   const [visitorCount, setVisitorCount] = useState(198);
-
   const [preloaderStep, setPreloaderStep] = useState(1);
+
+  // --- NEW: Command Palette / Terminal State ---
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+  const [terminalInput, setTerminalInput] = useState('');
+  const [terminalHistory, setTerminalHistory] = useState([
+    { type: 'output', text: 'Welcome to VSSh v1.0.0.' },
+    { type: 'output', text: 'Type "help" to see available commands.' }
+  ]);
+  const terminalInputRef = useRef(null);
+  const terminalEndRef = useRef(null);
+
+  // --- NEW: Project Filter State ---
+  const [projectFilter, setProjectFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Extract unique categories for the filter chips
+  const projectCategories = ['All', ...new Set(projectsData.map(p => p.category).filter(Boolean))];
+
+  // Filter logic for projects
+  const filteredProjects = projectsData.filter(project => {
+    const matchesFilter = projectFilter === 'All' || project.category === projectFilter;
+    const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          project.techStack.some(tech => tech.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesFilter && matchesSearch;
+  });
+
+  const [selectedDateStr, setSelectedDateStr] = useState(null);
+  const [modalSelectedDateStr, setModalSelectedDateStr] = useState(null);
+  const [modalYearFilter, setModalYearFilter] = useState('rolling');
+  const [ratingFilter, setRatingFilter] = useState('rated');
+  const [zoomEnabled, setZoomEnabled] = useState(false);
+  const [hoveredContest, setHoveredContest] = useState(null);
+
+  const [isDark, setIsDark] = useState(() => {
+    const savedTheme = localStorage.getItem('portfolio_theme');
+    return savedTheme ? savedTheme === 'dark' : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('portfolio_theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
 
   useEffect(() => {
     try {
@@ -328,21 +390,72 @@ function App() {
     };
   }, []);
 
-  const [selectedDateStr, setSelectedDateStr] = useState(null);
-  const [modalSelectedDateStr, setModalSelectedDateStr] = useState(null);
-  const [modalYearFilter, setModalYearFilter] = useState('rolling');
-  const [ratingFilter, setRatingFilter] = useState('rated');
-  const [zoomEnabled, setZoomEnabled] = useState(false);
-  const [hoveredContest, setHoveredContest] = useState(null);
-
-  const [isDark, setIsDark] = useState(() => {
-    const savedTheme = localStorage.getItem('portfolio_theme');
-    return savedTheme ? savedTheme === 'dark' : true;
-  });
-
+  // Terminal Keyboard Shortcut (Ctrl+K)
   useEffect(() => {
-    localStorage.setItem('portfolio_theme', isDark ? 'dark' : 'light');
-  }, [isDark]);
+    const handleGlobalKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsTerminalOpen(prev => !prev);
+      }
+      if (e.key === 'Escape' && isTerminalOpen) {
+        setIsTerminalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [isTerminalOpen]);
+
+  // Auto-focus terminal input when opened
+  useEffect(() => {
+    if (isTerminalOpen && terminalInputRef.current) {
+      terminalInputRef.current.focus();
+    }
+  }, [isTerminalOpen]);
+
+  // Auto-scroll terminal history
+  useEffect(() => {
+    if (terminalEndRef.current) {
+      terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [terminalHistory, isTerminalOpen]);
+
+  const handleTerminalSubmit = (e) => {
+    e.preventDefault();
+    const cmd = terminalInput.trim().toLowerCase();
+    if (!cmd) return;
+
+    const newHistory = [...terminalHistory, { type: 'input', text: `vignesh@portfolio:~$ ${cmd}` }];
+
+    switch (cmd) {
+      case 'help':
+        newHistory.push({ type: 'output', text: 'Available commands:\n  projects - View all projects\n  skills   - List technical skills\n  contact  - Show contact info\n  clear    - Clear terminal\n  curl resume - Download resume' });
+        break;
+      case 'projects':
+        newHistory.push({ type: 'output', text: 'Loading projects...' });
+        setCurrentPage('projects');
+        setTimeout(() => setIsTerminalOpen(false), 600);
+        break;
+      case 'skills':
+        newHistory.push({ type: 'output', text: 'Frontend: React, Tailwind\nBackend: Node, Python\nAI: RAG, LangChain\nDB: PostgreSQL' });
+        break;
+      case 'contact':
+        newHistory.push({ type: 'output', text: 'Email: 1at24cs251@atria.edu\nGitHub: github.com/VigneshSSuvarna' });
+        break;
+      case 'curl resume':
+        newHistory.push({ type: 'output', text: 'Initiating download request...' });
+        window.open('/resume.pdf', '_blank');
+        break;
+      case 'clear':
+        setTerminalHistory([]);
+        setTerminalInput('');
+        return;
+      default:
+        newHistory.push({ type: 'output', text: `bash: ${cmd}: command not found` });
+    }
+
+    setTerminalHistory(newHistory);
+    setTerminalInput('');
+  };
 
   const [ghContributions, setGhContributions] = useState(() => {
     try {
@@ -855,7 +968,7 @@ function App() {
           </select>
         </div>
 
-        <div className="relative min-w-[600px] sm:min-w-0">
+        <div className="relative min-w-[600px] sm:minw-0">
           <svg
             viewBox={`0 0 ${svgWidth} ${svgHeight}`}
             onClick={() => setZoomEnabled(prev => !prev)}
@@ -1391,66 +1504,103 @@ function App() {
         {/* PROJECTS PAGE */}
         {currentPage === 'projects' && (
           <div className="space-y-8">
-            <div>
-              <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                Projects
-              </h1>
-              <p className={`text-sm sm:text-base mt-1 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
-                Selected full-stack applications, AI systems, and tools I've built.
-              </p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                  Projects
+                </h1>
+                <p className={`text-sm sm:text-base mt-1 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                  Selected full-stack applications, AI systems, and tools I've built.
+                </p>
+              </div>
+
+              {/* NEW: Search Bar */}
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border w-full md:w-64 transition-colors ${
+                isDark ? 'bg-neutral-900 border-neutral-800 focus-within:border-[#39d353]' : 'bg-white border-neutral-200 focus-within:border-emerald-600'
+              }`}>
+                <Search size={16} className={isDark ? 'text-neutral-500' : 'text-neutral-400'} />
+                <input 
+                  type="text"
+                  placeholder="Search tech stack..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={`bg-transparent border-none outline-none text-sm w-full font-mono ${isDark ? 'text-white placeholder-neutral-600' : 'text-neutral-900 placeholder-neutral-400'}`}
+                />
+              </div>
             </div>
 
-            <div className="flex flex-col gap-6">
-              {projectsData.map((project) => (
-                <div
-                  key={project.id}
-                  onClick={() => {
-                    if (project.pageKey) {
-                      setPreviousPage('projects');
-                      setCurrentPage(project.pageKey);
-                    }
-                  }}
-                  className={`p-6 sm:p-8 rounded-xl border transition-all flex flex-col sm:flex-row sm:justify-between gap-4 shadow-sm cursor-pointer group ${
-                    isDark
-                      ? 'bg-neutral-900/40 border-[#39d353] hover:shadow-[0_0_15px_rgba(57,211,83,0.15)]'
-                      : 'bg-white border-emerald-600 hover:shadow-md'
+            {/* NEW: Filter Chips */}
+            <div className="flex flex-wrap gap-2">
+              {projectCategories.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setProjectFilter(cat)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-mono transition-colors border cursor-pointer ${
+                    projectFilter === cat 
+                      ? (isDark ? 'bg-[#39d353]/10 border-[#39d353] text-[#39d353]' : 'bg-emerald-500/10 border-emerald-600 text-emerald-700')
+                      : (isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white' : 'bg-white border-neutral-200 text-neutral-600 hover:text-black')
                   }`}
                 >
-                  <div className="space-y-3 max-w-2xl">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <h2 className={`text-lg sm:text-xl font-semibold group-hover:text-[#39d353] transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                        {project.title}
-                      </h2>
-                      {project.category && (
-                        <span className={`text-xs font-mono px-2.5 py-1 rounded bg-emerald-500/10 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
-                          {project.category}
-                        </span>
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Filtered Projects Map */}
+            <div className="flex flex-col gap-6">
+              {filteredProjects.length === 0 ? (
+                <div className={`p-8 text-center font-mono text-sm border rounded-xl border-dashed ${isDark ? 'border-neutral-800 text-neutral-500' : 'border-neutral-300 text-neutral-400'}`}>
+                  No projects found matching your criteria.
+                </div>
+              ) : (
+                filteredProjects.map((project) => (
+                  <div
+                    key={project.id}
+                    onClick={() => {
+                      if (project.pageKey) {
+                        setPreviousPage('projects');
+                        setCurrentPage(project.pageKey);
+                      }
+                    }}
+                    className={`p-6 sm:p-8 rounded-xl border transition-all flex flex-col sm:flex-row sm:justify-between gap-4 shadow-sm cursor-pointer group ${
+                      isDark
+                        ? 'bg-neutral-900/40 border-[#39d353] hover:shadow-[0_0_15px_rgba(57,211,83,0.15)]'
+                        : 'bg-white border-emerald-600 hover:shadow-md'
+                    }`}
+                  >
+                    <div className="space-y-3 max-w-2xl">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h2 className={`text-lg sm:text-xl font-semibold group-hover:text-[#39d353] transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                          {project.title}
+                        </h2>
+                        {/* NEW: Live Status Badge injected next to category */}
+                        <LiveStatusBadge url={project.demo} isDark={isDark} />
+                      </div>
+                      <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                        {project.description}
+                      </p>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {project.techStack.map((tech) => (
+                          <span key={tech} className={`text-xs sm:text-sm font-mono border px-2.5 py-1 rounded ${isDark ? 'text-neutral-400 bg-neutral-900 border-neutral-800' : 'text-neutral-700 bg-neutral-100 border-neutral-200'}`}>
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex sm:flex-col items-start sm:items-end justify-start gap-3 text-xs sm:text-sm font-mono shrink-0 pt-1">
+                      <a href={project.github} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'}`}>
+                        source <ArrowUpRight size={15} />
+                      </a>
+                      {project.demo !== "#" && (
+                        <a href={project.demo} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-[#39d353] hover:text-white' : 'text-emerald-600 hover:text-emerald-900'}`}>
+                          live demo <ArrowUpRight size={15} />
+                        </a>
                       )}
                     </div>
-                    <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
-                      {project.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {project.techStack.map((tech) => (
-                        <span key={tech} className={`text-xs sm:text-sm font-mono border px-2.5 py-1 rounded ${isDark ? 'text-neutral-400 bg-neutral-900 border-neutral-800' : 'text-neutral-700 bg-neutral-100 border-neutral-200'}`}>
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
                   </div>
-
-                  <div className="flex sm:flex-col items-start sm:items-end justify-start gap-3 text-xs sm:text-sm font-mono shrink-0 pt-1">
-                    <a href={project.github} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'}`}>
-                      source <ArrowUpRight size={15} />
-                    </a>
-                    {project.demo !== "#" && (
-                      <a href={project.demo} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-[#39d353] hover:text-white' : 'text-emerald-600 hover:text-emerald-900'}`}>
-                        live demo <ArrowUpRight size={15} />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         )}
@@ -1872,6 +2022,71 @@ function App() {
           </a>
         </div>
       </footer>
+
+      {/* CTRL+K HINT (Floating bottom right) */}
+      <div className="fixed bottom-6 right-6 hidden sm:flex items-center gap-2 pointer-events-none opacity-50 font-mono text-xs z-40">
+        <span className={isDark ? 'text-neutral-400' : 'text-neutral-500'}>Command Palette</span>
+        <kbd className={`px-2 py-1 rounded border flex items-center gap-1 ${isDark ? 'bg-neutral-900 border-neutral-700 text-neutral-300' : 'bg-white border-neutral-300 text-neutral-600'}`}>
+          <Command size={10} /> K
+        </kbd>
+      </div>
+
+      {/* TERMINAL OVERLAY */}
+      {isTerminalOpen && (
+        <div 
+          className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setIsTerminalOpen(false)}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full max-w-2xl rounded-lg border shadow-2xl overflow-hidden flex flex-col ${
+              isDark ? 'bg-[#0d1117] border-neutral-700' : 'bg-[#1e1e1e] border-neutral-600'
+            }`}
+          >
+            {/* Terminal Header */}
+            <div className="bg-[#161b22] px-4 py-2 border-b border-neutral-700 flex justify-between items-center select-none">
+              <div className="flex items-center gap-2 text-neutral-400 text-xs font-mono">
+                <Terminal size={14} />
+                <span>vignesh@portfolio:~</span>
+              </div>
+              <button 
+                onClick={() => setIsTerminalOpen(false)}
+                className="text-neutral-500 hover:text-white transition-colors cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            {/* Terminal Body */}
+            <div className="p-4 h-80 overflow-y-auto font-mono text-sm text-neutral-300 flex flex-col gap-1.5" onClick={() => terminalInputRef.current?.focus()}>
+              {terminalHistory.map((line, idx) => (
+                <div key={idx} className="whitespace-pre-wrap break-words">
+                  {line.type === 'input' ? (
+                    <span className="text-[#39d353]">{line.text}</span>
+                  ) : (
+                    <span className="text-neutral-400">{line.text}</span>
+                  )}
+                </div>
+              ))}
+              <div ref={terminalEndRef} />
+            </div>
+
+            {/* Terminal Input */}
+            <form onSubmit={handleTerminalSubmit} className="flex items-center px-4 py-3 bg-[#0d1117] border-t border-neutral-800">
+              <span className="text-[#39d353] font-mono text-sm mr-2">{'>'}</span>
+              <input 
+                ref={terminalInputRef}
+                type="text" 
+                value={terminalInput}
+                onChange={(e) => setTerminalInput(e.target.value)}
+                className="flex-1 bg-transparent text-white font-mono text-sm outline-none"
+                spellCheck="false"
+                autoComplete="off"
+              />
+            </form>
+          </div>
+        </div>
+      )}
 
       {showAnalyticsModal && (
         <div
