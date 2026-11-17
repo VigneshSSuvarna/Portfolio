@@ -112,9 +112,9 @@ const achievementsData = [
   },
   {
     id: 3,
-    title: "Competitive Programming ",
+    title: "Competitive Programming",
     subtitle: "Atria Institute of Technology",
-    description: "Active algorithmic problem solver on Codeforces and builder across national and university-level hackathons including Smart India Hackathon."
+    description: "Active algorithmic problem solver on Codeforces, practicing data structures, greedy algorithms, and optimization in C++ and Python."
   }
 ];
 
@@ -414,14 +414,6 @@ function App() {
   const [isSyncingCf, setIsSyncingCf] = useState(false);
   const [visitorCount, setVisitorCount] = useState(198);
 
-  const [preloaderStep, setPreloaderStep] = useState(() => {
-    try {
-      return sessionStorage.getItem('portfolio_preloader_seen') ? 4 : 1;
-    } catch {
-      return 1;
-    }
-  });
-
   // --- Command Palette / Terminal State ---
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
@@ -495,24 +487,6 @@ function App() {
       setVisitorCount(198);
     }
   }, []);
-
-  useEffect(() => {
-    if (preloaderStep === 4) return;
-    const timer1 = setTimeout(() => setPreloaderStep(2), 1500);
-    const timer2 = setTimeout(() => setPreloaderStep(3), 2500);
-    const timer3 = setTimeout(() => {
-      setPreloaderStep(4);
-      try {
-        sessionStorage.setItem('portfolio_preloader_seen', 'true');
-      } catch {}
-    }, 3300);
-    
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-    };
-  }, [preloaderStep]);
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText('1at24cs251@atria.edu');
@@ -1296,48 +1270,6 @@ function App() {
           : 'bg-[#fafafa] text-[#171717] selection:bg-neutral-200 selection:text-black'
       }`}
     >
-      {preloaderStep < 4 && (
-        <div
-          className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden transition-opacity duration-700 ease-in-out ${
-            isDark ? 'bg-[#111111]' : 'bg-[#fafafa]'
-          } ${preloaderStep === 3 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-        >
-          <div
-            className={`absolute flex items-center gap-3 transition-all duration-500 ease-in-out ${
-              preloaderStep === 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-            }`}
-          >
-            <span className={`text-2xl sm:text-4xl animate-pulse ${isDark ? 'text-[#39d353]' : 'text-emerald-600'}`}>
-              {"<"}
-            </span>
-            <h1 className={`text-2xl sm:text-4xl font-mono font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-              Welcome to my portfolio
-            </h1>
-            <span className={`text-2xl sm:text-4xl animate-pulse ${isDark ? 'text-[#39d353]' : 'text-emerald-600'}`}>
-              {"/>"}
-            </span>
-          </div>
-
-          <div
-            className={`absolute flex justify-center items-center transition-all duration-[800ms] ease-in-out ${
-              preloaderStep === 1 
-                ? 'opacity-0 scale-50' 
-                : preloaderStep === 2
-                ? 'opacity-100 scale-100'
-                : 'opacity-0 scale-[5] blur-md'
-            }`}
-          >
-            <img
-              src="/logo-main.png" 
-              alt="VS Logo"
-              className={`w-48 sm:w-64 object-contain rounded-xl ${
-                isDark ? 'shadow-[0_0_50px_rgba(57,211,83,0.15)]' : 'shadow-xl'
-              }`}
-            />
-          </div>
-        </div>
-      )}
-
       {/* Top Header */}
       <header
         className={`w-full px-6 sm:px-12 pt-8 sm:pt-10 pb-6 border-b flex justify-between items-center ${
@@ -2014,9 +1946,9 @@ function App() {
             <CaseStudyMetaBar
               role="Lead Developer"
               domain="Applied AI & RAG"
-              status="Completed"
+              status="Production Live"
               github="https://github.com/VigneshSSuvarna/AI-PDF-CHATBOX.git"
-              demo="#"
+              demo="https://ai-pdf-chatboxgit-bbhsv8xdll7e3vz498pf6n.streamlit.app/"
               isDark={isDark}
             />
 
