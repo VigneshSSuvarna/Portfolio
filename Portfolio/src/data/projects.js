@@ -11,9 +11,9 @@ export const projects = [
     id: 2,
     title: "AI-CHATBOX",
     description: "Retrieval-Augmented Generation (RAG) chatbot for document interaction.",
-    techStack: ["Python", "LangChain", "PyPDF", "React"],
+    techStack: ["Python", "LangChain", "PyPDF", "FastAPI", "ChromaDB"],
     github: "https://github.com/VigneshSSuvarna/AI-PDF-CHATBOX.git",
-    demo: "#"
+    demo: "https://ai-pdf-chatboxgit-bbhsv8xdll7e3vz498pf6n.streamlit.app/"
   }, 
   {
     id: 3,

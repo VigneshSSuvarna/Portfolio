@@ -1,8 +1,29 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { 
   X, ArrowUpRight, Sun, Moon, Download, Calendar, RefreshCw, 
-  ArrowLeft, Code2, Compass, Terminal, Search, Command 
+  ArrowLeft, Code2, Compass, Terminal, Search, Command,
+  Eye, Copy, Check, Award
 } from 'lucide-react';
+
+const VALID_PAGES = [
+  'home',
+  'projects',
+  'sama-foundation',
+  'cit-hearingaid',
+  'project-ai-chatbox',
+  'project-hiresphere',
+  'project-hermes'
+];
+
+const PAGE_TITLES = {
+  'home': 'Vignesh Suvarna | Software Architect & Applied AI Builder',
+  'projects': 'Projects | Vignesh Suvarna',
+  'sama-foundation': 'Nayi Disha Platform — Case Study | Vignesh Suvarna',
+  'cit-hearingaid': 'HearingAid Pro — Case Study | Vignesh Suvarna',
+  'project-ai-chatbox': 'AI-PDF-CHATBOX — Case Study | Vignesh Suvarna',
+  'project-hiresphere': 'HireSphere & PlaceOS — Case Study | Vignesh Suvarna',
+  'project-hermes': 'HERMES — Case Study | Vignesh Suvarna'
+};
 
 const projectsData = [
   {
@@ -20,9 +41,9 @@ const projectsData = [
     title: "AI-PDF-CHATBOX",
     category: "Applied AI",
     description: "High-performance RAG system designed to eliminate LLM hallucinations by grounding responses in private local documents.",
-    techStack: ["Python", "LangChain", "PyPDF"],
+    techStack: ["Python", "LangChain", "PyPDF", "FastAPI", "ChromaDB"],
     github: "https://github.com/VigneshSSuvarna/AI-PDF-CHATBOX.git",
-    demo: "#",
+    demo: "https://ai-pdf-chatboxgit-bbhsv8xdll7e3vz498pf6n.streamlit.app/",
     pageKey: "project-ai-chatbox"
   },
   {
@@ -69,10 +90,31 @@ const experienceData = [
   {
     id: 2,
     organization: "Dr. S. R. Chandrasekhar Institute of Speech and Hearing",
-    role: "Software Developer",
-    description: "Building institutional management platforms to streamline academic administration, student workflows, and resource allocation.",
+    role: "Project Team Lead",
+    description: "Leading the development team building assistive audio applications and institutional software to improve hearing accessibility.",
     projectTitle: "HearingAid Pro",
     pageKey: "cit-hearingaid"
+  }
+];
+
+const achievementsData = [
+  {
+    id: 1,
+    title: "Project Team Lead — HearingAid Pro Initiative",
+    subtitle: "Dr. S. R. Chandrasekhar Institute of Speech and Hearing",
+    description: "Leading a student engineering team developing a low-latency Android assistive audio application with custom digital signal processing."
+  },
+  {
+    id: 2,
+    title: "Full-Stack Developer — Nayi Disha Care Platform",
+    subtitle: "Sama Foundation NGO",
+    description: "Architecting role-based web portals and real-time hardware telemetry integrations to support special needs care networks."
+  },
+  {
+    id: 3,
+    title: "Competitive Programming ",
+    subtitle: "Atria Institute of Technology",
+    description: "Active algorithmic problem solver on Codeforces and builder across national and university-level hackathons including Smart India Hackathon."
   }
 ];
 
@@ -296,7 +338,6 @@ const LiveStatusBadge = ({ url, isDark }) => {
   const [latency, setLatency] = useState(null);
   
   useEffect(() => {
-    // Generate a realistic fake latency between 25ms and 110ms
     setLatency(Math.floor(Math.random() * 85) + 25);
   }, []);
 
@@ -312,16 +353,76 @@ const LiveStatusBadge = ({ url, isDark }) => {
   );
 };
 
+const CaseStudyMetaBar = ({ role, domain, status, github, demo, isDark }) => {
+  return (
+    <div className={`grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 sm:p-5 rounded-xl border font-mono text-xs ${
+      isDark ? 'bg-neutral-900/60 border-neutral-800' : 'bg-neutral-50 border-neutral-200'
+    }`}>
+      <div>
+        <div className="text-neutral-500 uppercase mb-1">Role</div>
+        <div className={`font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{role}</div>
+      </div>
+      <div>
+        <div className="text-neutral-500 uppercase mb-1">Domain</div>
+        <div className={`font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{domain}</div>
+      </div>
+      <div>
+        <div className="text-neutral-500 uppercase mb-1">Status</div>
+        <div className="text-[#39d353] font-semibold">{status}</div>
+      </div>
+      <div>
+        <div className="text-neutral-500 uppercase mb-1">Links</div>
+        <div className="flex items-center gap-3">
+          {github && (
+            <a
+              href={github}
+              target="_blank"
+              rel="noreferrer"
+              className={`inline-flex items-center gap-1 underline underline-offset-4 ${
+                isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-700 hover:text-black'
+              }`}
+            >
+              GitHub <ArrowUpRight size={13} />
+            </a>
+          )}
+          {demo && demo !== '#' && (
+            <a
+              href={demo}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-[#39d353] underline underline-offset-4"
+            >
+              Live <ArrowUpRight size={13} />
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+  const [currentPage, setCurrentPage] = useState(() => {
+    const hash = window.location.hash.replace('#', '');
+    return VALID_PAGES.includes(hash) ? hash : 'home';
+  });
   const [previousPage, setPreviousPage] = useState('home');
   const [activeHeatmap, setActiveHeatmap] = useState('github');
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
+  const [showResumeModal, setShowResumeModal] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const [isSyncingCf, setIsSyncingCf] = useState(false);
   const [visitorCount, setVisitorCount] = useState(198);
-  const [preloaderStep, setPreloaderStep] = useState(1);
 
-  // --- NEW: Command Palette / Terminal State ---
+  const [preloaderStep, setPreloaderStep] = useState(() => {
+    try {
+      return sessionStorage.getItem('portfolio_preloader_seen') ? 4 : 1;
+    } catch {
+      return 1;
+    }
+  });
+
+  // --- Command Palette / Terminal State ---
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalHistory, setTerminalHistory] = useState([
@@ -331,14 +432,12 @@ function App() {
   const terminalInputRef = useRef(null);
   const terminalEndRef = useRef(null);
 
-  // --- NEW: Project Filter State ---
+  // --- Project Filter State ---
   const [projectFilter, setProjectFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Extract unique categories for the filter chips
   const projectCategories = ['All', ...new Set(projectsData.map(p => p.category).filter(Boolean))];
 
-  // Filter logic for projects
   const filteredProjects = projectsData.filter(project => {
     const matchesFilter = projectFilter === 'All' || project.category === projectFilter;
     const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -362,6 +461,25 @@ function App() {
     localStorage.setItem('portfolio_theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
+  // Sync currentPage with URL hash, document title, and scroll position
+  useEffect(() => {
+    const targetHash = currentPage === 'home' ? '' : `#${currentPage}`;
+    if (window.location.hash !== targetHash) {
+      window.history.pushState(null, '', targetHash || window.location.pathname);
+    }
+    document.title = PAGE_TITLES[currentPage] || 'Vignesh Suvarna';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const hash = window.location.hash.replace('#', '');
+      setCurrentPage(VALID_PAGES.includes(hash) ? hash : 'home');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   useEffect(() => {
     try {
       const hasVisitedSession = sessionStorage.getItem('portfolio_session_counted');
@@ -379,40 +497,52 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (preloaderStep === 4) return;
     const timer1 = setTimeout(() => setPreloaderStep(2), 1500);
     const timer2 = setTimeout(() => setPreloaderStep(3), 2500);
-    const timer3 = setTimeout(() => setPreloaderStep(4), 3300);
+    const timer3 = setTimeout(() => {
+      setPreloaderStep(4);
+      try {
+        sessionStorage.setItem('portfolio_preloader_seen', 'true');
+      } catch {}
+    }, 3300);
     
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, []);
+  }, [preloaderStep]);
 
-  // Terminal Keyboard Shortcut (Ctrl+K)
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText('1at24cs251@atria.edu');
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
+  };
+
+  // Global Keyboard Shortcuts (Ctrl+K & Escape)
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setIsTerminalOpen(prev => !prev);
       }
-      if (e.key === 'Escape' && isTerminalOpen) {
-        setIsTerminalOpen(false);
+      if (e.key === 'Escape') {
+        if (isTerminalOpen) setIsTerminalOpen(false);
+        if (showResumeModal) setShowResumeModal(false);
+        if (showAnalyticsModal) setShowAnalyticsModal(false);
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [isTerminalOpen]);
+  }, [isTerminalOpen, showResumeModal, showAnalyticsModal]);
 
-  // Auto-focus terminal input when opened
   useEffect(() => {
     if (isTerminalOpen && terminalInputRef.current) {
       terminalInputRef.current.focus();
     }
   }, [isTerminalOpen]);
 
-  // Auto-scroll terminal history
   useEffect(() => {
     if (terminalEndRef.current) {
       terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -428,18 +558,38 @@ function App() {
 
     switch (cmd) {
       case 'help':
-        newHistory.push({ type: 'output', text: 'Available commands:\n  projects - View all projects\n  skills   - List technical skills\n  contact  - Show contact info\n  clear    - Clear terminal\n  curl resume - Download resume' });
+        newHistory.push({
+          type: 'output',
+          text: 'Available commands:\n  about       - Go to About page\n  projects    - View all projects\n  skills      - List technical skills\n  contact     - Copy & show contact info\n  resume      - Open interactive resume preview\n  curl resume - Download resume PDF\n  clear       - Clear terminal'
+        });
+        break;
+      case 'about':
+        newHistory.push({ type: 'output', text: 'Navigating to about...' });
+        setCurrentPage('home');
+        setTimeout(() => setIsTerminalOpen(false), 500);
         break;
       case 'projects':
         newHistory.push({ type: 'output', text: 'Loading projects...' });
         setCurrentPage('projects');
-        setTimeout(() => setIsTerminalOpen(false), 600);
+        setTimeout(() => setIsTerminalOpen(false), 500);
         break;
       case 'skills':
-        newHistory.push({ type: 'output', text: 'Frontend: React, Tailwind\nBackend: Node, Python\nAI: RAG, LangChain\nDB: PostgreSQL' });
+        newHistory.push({
+          type: 'output',
+          text: 'Languages: Python, JS/TS, C++, C, Java, Kotlin, SQL\nFrontend:  React, Vite, Tailwind CSS\nBackend:   Node.js, Express, Python asyncio\nAI & Data: RAG, LangChain, LLMs, PyPDF'
+        });
         break;
       case 'contact':
-        newHistory.push({ type: 'output', text: 'Email: 1at24cs251@atria.edu\nGitHub: github.com/VigneshSSuvarna' });
+        navigator.clipboard?.writeText('1at24cs251@atria.edu').catch(() => {});
+        newHistory.push({
+          type: 'output',
+          text: 'Email: 1at24cs251@atria.edu (copied to clipboard!)\nGitHub: github.com/VigneshSSuvarna\nCodeforces: codeforces.com/profile/VigneshSSuvarna'
+        });
+        break;
+      case 'resume':
+        newHistory.push({ type: 'output', text: 'Opening resume preview...' });
+        setIsTerminalOpen(false);
+        setShowResumeModal(true);
         break;
       case 'curl resume':
         newHistory.push({ type: 'output', text: 'Initiating download request...' });
@@ -450,7 +600,7 @@ function App() {
         setTerminalInput('');
         return;
       default:
-        newHistory.push({ type: 'output', text: `bash: ${cmd}: command not found` });
+        newHistory.push({ type: 'output', text: `bash: ${cmd}: command not found. Type "help" for available commands.` });
     }
 
     setTerminalHistory(newHistory);
@@ -968,7 +1118,7 @@ function App() {
           </select>
         </div>
 
-        <div className="relative min-w-[600px] sm:minw-0">
+        <div className="relative min-w-[600px] sm:min-w-0">
           <svg
             viewBox={`0 0 ${svgWidth} ${svgHeight}`}
             onClick={() => setZoomEnabled(prev => !prev)}
@@ -1247,7 +1397,7 @@ function App() {
         </nav>
       </header>
 
-      {/* Main Content - Full Screen Width */}
+      {/* Main Content */}
       <main className="w-full px-6 sm:px-12 py-10 sm:py-16 flex-1 max-w-7xl mx-auto">
         {currentPage === 'home' && (
           <div className="space-y-10 sm:space-y-12">
@@ -1275,7 +1425,19 @@ function App() {
                   <p className={`text-sm sm:text-lg leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
                     Full-stack software architect & applied AI builder focused on backend scalability, asynchronous processing, and low-latency systems.
                   </p>
-                  <div className="pt-2 flex justify-center">
+                  <div className="pt-2 flex flex-wrap justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowResumeModal(true)}
+                      className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono px-4 py-2.5 rounded-lg border font-medium cursor-pointer transition-colors ${
+                        isDark
+                          ? 'border-[#39d353]/50 bg-[#39d353]/10 text-[#39d353] hover:bg-[#39d353]/20'
+                          : 'border-emerald-600 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                      }`}
+                    >
+                      <Eye size={16} /> Preview Resume
+                    </button>
+
                     <a
                       href="/resume.pdf"
                       download
@@ -1287,6 +1449,19 @@ function App() {
                     >
                       <Download size={16} /> Download Resume
                     </a>
+
+                    <button
+                      type="button"
+                      onClick={handleCopyEmail}
+                      className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono px-4 py-2.5 rounded-lg border font-medium cursor-pointer transition-colors ${
+                        isDark
+                          ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:border-neutral-700 hover:text-white'
+                          : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:text-black'
+                      }`}
+                    >
+                      {copiedEmail ? <Check size={16} className="text-[#39d353]" /> : <Copy size={16} />}
+                      {copiedEmail ? 'Copied Email!' : '1at24cs251@atria.edu'}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1351,7 +1526,7 @@ function App() {
               <div className="flex items-center gap-2 mb-6">
                 <Code2 size={20} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
                 <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                  Ongoing Work
+                   Ongoing Work
                 </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1393,6 +1568,38 @@ function App() {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* BOX 4: LEADERSHIP & ACHIEVEMENTS */}
+            <div className={`p-6 sm:p-8 rounded-2xl border transition-all shadow-sm ${
+              isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
+            }`}>
+              <div className="flex items-center gap-2 mb-6">
+                <Award size={20} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
+                <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                  Leadership & Highlights
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {achievementsData.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`p-5 rounded-xl border ${
+                      isDark ? 'bg-neutral-900/50 border-neutral-800' : 'bg-neutral-50 border-neutral-200'
+                    }`}
+                  >
+                    <div className={`font-semibold text-sm sm:text-base mb-1 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                      {item.title}
+                    </div>
+                    <div className={`text-xs font-mono mb-2.5 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                      {item.subtitle}
+                    </div>
+                    <p className={`text-xs sm:text-sm leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                      {item.description}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -1514,7 +1721,7 @@ function App() {
                 </p>
               </div>
 
-              {/* NEW: Search Bar */}
+              {/* Search Bar */}
               <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border w-full md:w-64 transition-colors ${
                 isDark ? 'bg-neutral-900 border-neutral-800 focus-within:border-[#39d353]' : 'bg-white border-neutral-200 focus-within:border-emerald-600'
               }`}>
@@ -1529,7 +1736,7 @@ function App() {
               </div>
             </div>
 
-            {/* NEW: Filter Chips */}
+            {/* Filter Chips */}
             <div className="flex flex-wrap gap-2">
               {projectCategories.map(cat => (
                 <button
@@ -1573,7 +1780,11 @@ function App() {
                         <h2 className={`text-lg sm:text-xl font-semibold group-hover:text-[#39d353] transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                           {project.title}
                         </h2>
-                        {/* NEW: Live Status Badge injected next to category */}
+                        {project.category && (
+                          <span className={`text-xs font-mono px-2.5 py-1 rounded bg-emerald-500/10 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                            {project.category}
+                          </span>
+                        )}
                         <LiveStatusBadge url={project.demo} isDark={isDark} />
                       </div>
                       <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
@@ -1626,6 +1837,15 @@ function App() {
                 Sama Foundation • Full-Stack Developer Project
               </p>
             </div>
+
+            <CaseStudyMetaBar
+              role="Full-Stack Developer"
+              domain="Care Platform & IoT"
+              status="Production Live"
+              github="https://github.com/Nayi-Disha-Org/Nayi-Disha.git"
+              demo="https://nayi-disha-web.vercel.app"
+              isDark={isDark}
+            />
 
             <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
               isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
@@ -1705,9 +1925,18 @@ function App() {
                 HearingAid Pro
               </h1>
               <p className={`text-xs sm:text-sm font-mono mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
-                Dr. S. R. Chandrasekhar Institute of Speech and Hearing • Software Developer Project
+                Dr. S. R. Chandrasekhar Institute of Speech and Hearing • Project Team Lead
               </p>
             </div>
+
+            <CaseStudyMetaBar
+              role="Project Team Lead"
+              domain="Android & Real-Time DSP"
+              status="Active Development"
+              github="https://github.com/VigneshSSuvarna/HearingAid.git"
+              demo="#"
+              isDark={isDark}
+            />
 
             <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
               isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
@@ -1782,6 +2011,15 @@ function App() {
               </p>
             </div>
 
+            <CaseStudyMetaBar
+              role="Lead Developer"
+              domain="Applied AI & RAG"
+              status="Completed"
+              github="https://github.com/VigneshSSuvarna/AI-PDF-CHATBOX.git"
+              demo="#"
+              isDark={isDark}
+            />
+
             <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
               isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
             }`}>
@@ -1846,6 +2084,15 @@ function App() {
               </p>
             </div>
 
+            <CaseStudyMetaBar
+              role="Full-Stack Architect"
+              domain="Enterprise Web App"
+              status="Ongoing"
+              github="https://github.com/VigneshSSuvarna/HireSphere.git"
+              demo="#"
+              isDark={isDark}
+            />
+
             <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
               isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
             }`}>
@@ -1907,6 +2154,15 @@ function App() {
               </p>
             </div>
 
+            <CaseStudyMetaBar
+              role="Systems & AI Builder"
+              domain="Asyncio & Voice AI"
+              status="Active Prototype"
+              github="https://github.com/VigneshSSuvarna/HERMES.git"
+              demo="#"
+              isDark={isDark}
+            />
+
             <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
               isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
             }`}>
@@ -1950,7 +2206,7 @@ function App() {
         )}
       </main>
 
-      {/* Footer - Full Screen Width */}
+      {/* Footer */}
       <footer
         className={`w-full px-6 sm:px-12 py-6 sm:py-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm max-w-7xl mx-auto ${
           isDark ? 'border-neutral-800/80 text-[#8a8a8a]' : 'border-neutral-200 text-neutral-500'
@@ -2023,13 +2279,24 @@ function App() {
         </div>
       </footer>
 
-      {/* CTRL+K HINT (Floating bottom right) */}
-      <div className="fixed bottom-6 right-6 hidden sm:flex items-center gap-2 pointer-events-none opacity-50 font-mono text-xs z-40">
-        <span className={isDark ? 'text-neutral-400' : 'text-neutral-500'}>console</span>
-        <kbd className={`px-2 py-1 rounded border flex items-center gap-1 ${isDark ? 'bg-neutral-900 border-neutral-700 text-neutral-300' : 'bg-white border-neutral-300 text-neutral-600'}`}>
-          <Command size={10} /> K
+      {/* CLICKABLE CONSOLE TRIGGER (Works on Mobile & Desktop) */}
+      <button
+        type="button"
+        onClick={() => setIsTerminalOpen(true)}
+        className={`fixed bottom-6 right-6 flex items-center gap-2 font-mono text-xs z-40 px-3 py-2 rounded-lg border shadow-lg cursor-pointer transition-all ${
+          isDark
+            ? 'bg-neutral-900/90 border-neutral-800 text-neutral-300 hover:border-[#39d353] hover:text-white'
+            : 'bg-white/90 border-neutral-300 text-neutral-700 hover:border-emerald-600 hover:text-black'
+        }`}
+      >
+        <Terminal size={13} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
+        <span>console</span>
+        <kbd className={`hidden sm:inline-flex px-1.5 py-0.5 rounded border items-center gap-0.5 text-[10px] ${
+          isDark ? 'bg-neutral-800 border-neutral-700 text-neutral-400' : 'bg-neutral-100 border-neutral-300 text-neutral-500'
+        }`}>
+          <Command size={9} /> K
         </kbd>
-      </div>
+      </button>
 
       {/* TERMINAL OVERLAY */}
       {isTerminalOpen && (
@@ -2043,7 +2310,6 @@ function App() {
               isDark ? 'bg-[#0d1117] border-neutral-700' : 'bg-[#1e1e1e] border-neutral-600'
             }`}
           >
-            {/* Terminal Header */}
             <div className="bg-[#161b22] px-4 py-2 border-b border-neutral-700 flex justify-between items-center select-none">
               <div className="flex items-center gap-2 text-neutral-400 text-xs font-mono">
                 <Terminal size={14} />
@@ -2057,7 +2323,6 @@ function App() {
               </button>
             </div>
 
-            {/* Terminal Body */}
             <div className="p-4 h-80 overflow-y-auto font-mono text-sm text-neutral-300 flex flex-col gap-1.5" onClick={() => terminalInputRef.current?.focus()}>
               {terminalHistory.map((line, idx) => (
                 <div key={idx} className="whitespace-pre-wrap break-words">
@@ -2071,7 +2336,6 @@ function App() {
               <div ref={terminalEndRef} />
             </div>
 
-            {/* Terminal Input */}
             <form onSubmit={handleTerminalSubmit} className="flex items-center px-4 py-3 bg-[#0d1117] border-t border-neutral-800">
               <span className="text-[#39d353] font-mono text-sm mr-2">{'>'}</span>
               <input 
@@ -2079,7 +2343,8 @@ function App() {
                 type="text" 
                 value={terminalInput}
                 onChange={(e) => setTerminalInput(e.target.value)}
-                className="flex-1 bg-transparent text-white font-mono text-sm outline-none"
+                placeholder="Type a command (e.g., help, projects, resume)..."
+                className="flex-1 bg-transparent text-white font-mono text-sm outline-none placeholder-neutral-600"
                 spellCheck="false"
                 autoComplete="off"
               />
@@ -2088,6 +2353,55 @@ function App() {
         </div>
       )}
 
+      {/* IN-APP RESUME PREVIEW MODAL */}
+      {showResumeModal && (
+        <div
+          className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+          onClick={() => setShowResumeModal(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full max-w-4xl h-[85vh] rounded-xl border shadow-2xl flex flex-col overflow-hidden ${
+              isDark ? 'bg-[#141414] border-neutral-800' : 'bg-white border-neutral-300'
+            }`}
+          >
+            <div className={`px-4 py-3 border-b flex justify-between items-center ${
+              isDark ? 'border-neutral-800 bg-[#161b22]' : 'border-neutral-200 bg-neutral-50'
+            }`}>
+              <span className={`font-mono text-xs sm:text-sm font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                resume.pdf — Vignesh Suvarna
+              </span>
+              <div className="flex items-center gap-3">
+                <a
+                  href="/resume.pdf"
+                  download
+                  className={`inline-flex items-center gap-1.5 text-xs font-mono px-3 py-1 rounded border transition-colors ${
+                    isDark
+                      ? 'border-[#39d353]/40 bg-[#39d353]/10 text-[#39d353] hover:bg-[#39d353]/20'
+                      : 'border-emerald-600 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                  }`}
+                >
+                  <Download size={13} /> Download PDF
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setShowResumeModal(false)}
+                  className="text-neutral-400 hover:text-white cursor-pointer p-1"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+            <iframe
+              src="/resume.pdf"
+              title="Vignesh Suvarna Resume"
+              className="w-full flex-1 bg-neutral-900"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* CODEFORCES ANALYTICS MODAL */}
       {showAnalyticsModal && (
         <div
           className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-5 overflow-y-auto"
