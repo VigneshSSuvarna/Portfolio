@@ -23,7 +23,8 @@ export const VALID_PAGES = [
   'cit-hearingaid',
   'project-ai-chatbox',
   'project-hiresphere',
-  'project-hermes'
+  'project-hermes',
+  'project-kalki'
 ];
 
 export const PAGE_TITLES = {
@@ -33,7 +34,8 @@ export const PAGE_TITLES = {
   'cit-hearingaid': 'HearingAid Pro — Case Study | Vignesh Suvarna',
   'project-ai-chatbox': 'AI-PDF-CHATBOX — Case Study | Vignesh Suvarna',
   'project-hiresphere': 'HireSphere & PlaceOS — Case Study | Vignesh Suvarna',
-  'project-hermes': 'HERMES — Case Study | Vignesh Suvarna'
+  'project-hermes': 'HERMES — Case Study | Vignesh Suvarna',
+  'project-kalki': 'Kalki — Case Study | Vignesh Suvarna'
 };
 
 export const projectsData = [
@@ -86,7 +88,19 @@ export const projectsData = [
     github: "https://github.com/VigneshSSuvarna/HearingAid.git",
     demo: "#",
     pageKey: "cit-hearingaid"
-  }
+  },
+  
+  {
+  id: 6,
+  title: "Kalki",
+  category: "Systems & AIOps",
+  description: "Two-tier, zero-raw-egress fleet telemetry and AIOps platform with edge secret scrubbing, durable disk WAL, SHA-256 egress proofs, and a real-time SSE operations console.",
+  techStack: ["Go", "React", "TypeScript", "PostgreSQL", "SSE", "Recharts"],
+  github: "https://github.com/VigneshSSuvarna/kalki",
+  demo: "https://kalki-systems.vercel.app/",
+  pageKey: "project-kalki"
+}
+  
 ];
 
 export const experienceData = [

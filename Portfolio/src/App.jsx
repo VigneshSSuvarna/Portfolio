@@ -10,6 +10,7 @@ import HearingAidPage from './pages/HearingAidPage';
 import AiChatboxPage from './pages/AiChatboxPage';
 import HireSpherePage from './pages/HireSpherePage';
 import HermesPage from './pages/HermesPage';
+import KalkiPage from './pages/KalkiPage';
 
 // Components & Modals
 import { TerminalModal } from './components/TerminalModal';
@@ -107,6 +108,7 @@ export default function App() {
         {currentPage === 'project-ai-chatbox' && <AiChatboxPage isDark={isDark} setCurrentPage={setCurrentPage} />}
         {currentPage === 'project-hiresphere' && <HireSpherePage isDark={isDark} setCurrentPage={setCurrentPage} />}
         {currentPage === 'project-hermes' && <HermesPage isDark={isDark} setCurrentPage={setCurrentPage} />}
+        {currentPage === 'project-kalki' && <KalkiPage isDark={isDark} setCurrentPage={setCurrentPage} />}
       </main>
 
       <footer className={`w-full px-6 sm:px-12 py-6 sm:py-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm max-w-7xl mx-auto ${isDark ? 'border-neutral-800/80 text-[#8a8a8a]' : 'border-neutral-200 text-neutral-500'}`}>
