@@ -298,7 +298,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
               <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                 {personalInfo.name}
               </h1>
-              <p className={`text-sm sm:text-base font-medium mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+              <p className={`text-sm sm:text-base font-medium mt-1 ${isDark ? 'text-neutral-300' : 'text-neutral-700'}`}>
                 {personalInfo.role} @ {personalInfo.university}
               </p>
             </div>
@@ -311,8 +311,8 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                 onClick={() => setShowResumeModal(true)}
                 className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono px-4 py-2.5 rounded-lg border font-medium cursor-pointer transition-colors ${
                   isDark
-                    ? 'border-[#39d353]/50 bg-[#39d353]/10 text-[#39d353] hover:bg-[#39d353]/20'
-                    : 'border-emerald-600 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                    ? 'border-white bg-white text-black hover:bg-neutral-200'
+                    : 'border-neutral-900 bg-neutral-900 text-white hover:bg-neutral-800'
                 }`}
               >
                 <Eye size={16} /> Preview Resume
@@ -339,7 +339,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                     : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:text-black'
                 }`}
               >
-                {copiedEmail ? <Check size={16} className="text-[#39d353]" /> : <Copy size={16} />}
+                {copiedEmail ? <Check size={16} className={isDark ? 'text-white' : 'text-black'} /> : <Copy size={16} />}
                 {copiedEmail ? 'Copied Email!' : personalInfo.email}
               </button>
             </div>
@@ -352,22 +352,22 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
         isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
       }`}>
         <div className="flex items-center gap-2 mb-4">
-          <Terminal size={20} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
+          <Terminal size={20} className={isDark ? 'text-white' : 'text-neutral-900'} />
           <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
             Background
           </h2>
         </div>
         <ul className={`space-y-3 text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
           <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
             <span>I am a 3rd-year Computer Science & Engineering undergraduate.</span>
           </li>
           <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
             <span>Currently working on full-stack web architectures and applied AI systems, focusing on backend scalability, asynchronous processing, and intelligent document retrieval.</span>
           </li>
           <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
             <span>Driven by clean system design, I enjoy translating complex real-world problems into reliable, low-latency, and production-ready software.</span>
           </li>
         </ul>
@@ -378,22 +378,22 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
         isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
       }`}>
         <div className="flex items-center gap-2 mb-4">
-          <Compass size={20} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
+          <Compass size={20} className={isDark ? 'text-white' : 'text-neutral-900'} />
           <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
             Areas of Exploration
           </h2>
         </div>
         <ul className={`space-y-3 text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
           <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
             <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>Competitive Programming:</strong> I actively practice algorithmic problem-solving on Codeforces, primarily writing solutions in C++ and Python.</span>
           </li>
           <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
             <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>AI Architecture & Full-Stack Systems:</strong> Designing Retrieval-Augmented Generation (RAG) pipelines, working with vector embeddings, and deploying scalable backend infrastructure.</span>
           </li>
           <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`} />
+            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
             <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>Beyond Coding:</strong> Exploring new AI capabilities, building accessible applications, and unwinding with video games.</span>
           </li>
         </ul>
@@ -404,7 +404,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
         isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
       }`}>
         <div className="flex items-center gap-2 mb-6">
-          <Code2 size={20} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
+          <Code2 size={20} className={isDark ? 'text-white' : 'text-neutral-900'} />
           <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
             Ongoing Work
           </h2>
@@ -423,25 +423,29 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                 }}
                 className={`p-6 rounded-xl border transition-all cursor-pointer group flex flex-col justify-between ${
                   isDark 
-                    ? 'bg-neutral-900/60 border-neutral-800 hover:border-[#39d353]' 
-                    : 'bg-neutral-50 border-neutral-200 hover:border-emerald-600'
+                    ? 'bg-neutral-900/60 border-neutral-800 hover:border-neutral-500' 
+                    : 'bg-neutral-50 border-neutral-200 hover:border-neutral-400'
                 }`}
               >
                 <div>
                   <div className="flex justify-between items-start gap-2 mb-2">
-                    <h3 className={`font-semibold text-lg group-hover:text-[#39d353] transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                    <h3 className={`font-semibold text-lg group-hover:underline underline-offset-4 transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                       {exp.organization}
                     </h3>
-                    <ArrowUpRight size={18} className="text-neutral-500 group-hover:text-[#39d353] shrink-0 transition-colors" />
+                    <ArrowUpRight size={18} className={`text-neutral-500 shrink-0 transition-colors ${isDark ? 'group-hover:text-white' : 'group-hover:text-black'}`} />
                   </div>
-                  <span className="text-xs font-mono px-2.5 py-1 rounded bg-emerald-500/10 text-[#39d353] inline-block mb-3">
+                  <span className={`text-xs font-mono px-2.5 py-1 rounded inline-block mb-3 ${
+                    isDark ? 'bg-neutral-800 text-neutral-200' : 'bg-neutral-200 text-neutral-800'
+                  }`}>
                     {exp.role}
                   </span>
                   <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
                     {exp.description}
                   </p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-neutral-800/40 text-xs sm:text-sm font-mono text-[#39d353] flex items-center justify-between">
+                <div className={`mt-6 pt-4 border-t border-neutral-800/40 text-xs sm:text-sm font-mono flex items-center justify-between ${
+                  isDark ? 'text-neutral-200 group-hover:text-white' : 'text-neutral-800 group-hover:text-black'
+                }`}>
                   <span>View {exp.projectTitle}</span>
                   <span>→</span>
                 </div>
@@ -456,7 +460,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
         isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
       }`}>
         <div className="flex items-center gap-2 mb-6">
-          <Award size={20} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
+          <Award size={20} className={isDark ? 'text-white' : 'text-neutral-900'} />
           <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
             Leadership & Highlights
           </h2>
@@ -472,7 +476,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
               <div className={`font-semibold text-sm sm:text-base mb-1 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                 {item.title}
               </div>
-              <div className={`text-xs font-mono mb-2.5 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+              <div className={`text-xs font-mono mb-2.5 ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
                 {item.subtitle}
               </div>
               <p className={`text-xs sm:text-sm leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
@@ -579,7 +583,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                                       <div className="absolute bottom-full mb-2 z-30 px-2.5 py-1 rounded text-[11px] font-mono whitespace-nowrap shadow-lg pointer-events-none border bg-neutral-900 text-white border-neutral-700">
                                         <span className="font-semibold">{formatDisplayDate(day.dateStr)}</span>
                                         <span className="text-neutral-400"> • </span>
-                                        <span className="text-[#39d353]">{count} {unitLabel}{count === 1 ? '' : 's'}</span>
+                                        <span className="text-white font-semibold">{count} {unitLabel}{count === 1 ? '' : 's'}</span>
                                       </div>
                                     )}
                                   </div>
@@ -596,7 +600,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                 <div className="flex flex-wrap justify-between items-center gap-3 text-xs font-mono pt-1">
                   {selectedDateStr ? (
                     <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded border ${isDark ? 'bg-neutral-900/90 border-neutral-800 text-neutral-200' : 'bg-neutral-100 border-neutral-200 text-neutral-800'}`}>
-                      <Calendar size={13} className="text-[#39d353] shrink-0" />
+                      <Calendar size={13} className={isDark ? 'text-white shrink-0' : 'text-neutral-900 shrink-0'} />
                       <span>
                         <strong className={isDark ? 'text-white' : 'text-black'}>{formatDisplayDate(selectedDateStr)}</strong>
                         {' — '}

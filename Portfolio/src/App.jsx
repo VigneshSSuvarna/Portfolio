@@ -115,14 +115,13 @@ export default function App() {
         <div className="text-center sm:text-left flex flex-wrap items-center justify-center sm:justify-start gap-4">
           <span>© {new Date().getFullYear()} {personalInfo.name}. Built with React & Vite.</span>
           <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md font-mono text-xs border ${isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-300' : 'bg-neutral-100 border-neutral-200 text-neutral-700'}`}>
-            <span className="font-semibold text-[#39d353]">{visitorCount}</span>
-            <span>visitors</span>
+<span className={`font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{visitorCount}</span>            <span>visitors</span>
           </div>
         </div>
       </footer>
 
-      <button type="button" onClick={() => setIsTerminalOpen(true)} className={`fixed bottom-6 right-6 flex items-center gap-2 font-mono text-xs z-40 px-3 py-2 rounded-lg border shadow-lg cursor-pointer transition-all ${isDark ? 'bg-neutral-900/90 border-neutral-800 text-neutral-300 hover:border-[#39d353] hover:text-white' : 'bg-white/90 border-neutral-300 text-neutral-700 hover:border-emerald-600 hover:text-black'}`}>
-        <Terminal size={13} className={isDark ? 'text-[#39d353]' : 'text-emerald-600'} />
+      <button type="button" onClick={() => setIsTerminalOpen(true)} className={`fixed bottom-6 right-6 flex items-center gap-2 font-mono text-xs z-40 px-3 py-2 rounded-lg border shadow-lg cursor-pointer transition-all ${isDark ? 'bg-neutral-900/90 border-neutral-800 text-neutral-300 hover:border-neutral-600 hover:text-white' : 'bg-white/90 border-neutral-300 text-neutral-700 hover:border-neutral-500 hover:text-black'}`}>
+  <Terminal size={13} className={isDark ? 'text-neutral-300' : 'text-neutral-700'} />
         <span>console</span>
         <kbd className={`hidden sm:inline-flex px-1.5 py-0.5 rounded border items-center gap-0.5 text-[10px] ${isDark ? 'bg-neutral-800 border-neutral-700 text-neutral-400' : 'bg-neutral-100 border-neutral-300 text-neutral-500'}`}><Command size={9} /> K</kbd>
       </button>

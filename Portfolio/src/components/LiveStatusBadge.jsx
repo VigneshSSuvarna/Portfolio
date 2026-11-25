@@ -11,9 +11,9 @@ export const LiveStatusBadge = ({ url, isDark }) => {
 
   return (
     <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-[10px] font-mono shrink-0 ${
-      isDark ? 'bg-emerald-500/10 border-emerald-900/50 text-[#39d353]' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+      isDark ? 'bg-neutral-800/80 border-neutral-700 text-neutral-300' : 'bg-neutral-100 border-neutral-300 text-neutral-700'
     }`}>
-      <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isDark ? 'bg-[#39d353]' : 'bg-emerald-600'}`}></span>
+      <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isDark ? 'bg-white' : 'bg-neutral-900'}`}></span>
       <span>Online • {latency}ms</span>
     </div>
   );

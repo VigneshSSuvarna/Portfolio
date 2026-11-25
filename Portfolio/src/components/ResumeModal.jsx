@@ -26,10 +26,10 @@ export const ResumeModal = ({ isOpen, onClose, isDark }) => {
               href="/resume.pdf"
               download
               className={`inline-flex items-center gap-1.5 text-xs font-mono px-3 py-1 rounded border transition-colors ${
-                isDark
-                  ? 'border-[#39d353]/40 bg-[#39d353]/10 text-[#39d353] hover:bg-[#39d353]/20'
-                  : 'border-emerald-600 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-              }`}
+  isDark
+    ? 'border-neutral-700 bg-neutral-800 text-neutral-200 hover:bg-neutral-700 hover:text-white'
+    : 'border-neutral-300 bg-neutral-100 text-neutral-800 hover:bg-neutral-200 hover:text-black'
+}`}
             >
               <Download size={13} /> Download PDF
             </a>

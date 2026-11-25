@@ -8,7 +8,7 @@ export const CaseStudyMetaBar = ({ role, domain, status, github, demo, isDark })
     }`}>
       <div>
         <div className="text-neutral-500 uppercase mb-1">Role</div>
-        <div className={`font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{role}</div>
+        <div className={`font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{role}</div><div className={`font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{status}</div>
       </div>
       <div>
         <div className="text-neutral-500 uppercase mb-1">Domain</div>
@@ -27,8 +27,8 @@ export const CaseStudyMetaBar = ({ role, domain, status, github, demo, isDark })
               target="_blank"
               rel="noreferrer"
               className={`inline-flex items-center gap-1 underline underline-offset-4 ${
-                isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-700 hover:text-black'
-              }`}
+  isDark ? 'text-white hover:text-neutral-300' : 'text-neutral-900 hover:text-black'
+}`}
             >
               GitHub <ArrowUpRight size={13} />
             </a>

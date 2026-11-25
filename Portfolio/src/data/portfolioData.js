@@ -146,11 +146,11 @@ export const achievementsData = [
 export const skillsData = [
   {
     category: "Languages",
-    items: ["Python", "JavaScript", "TypeScript", "C++", "C", "Java", "Kotlin", "SQL"]
+    items: ["Python", "JavaScript", "C++", "C", "SQL"]
   },
   {
     category: "Frontend",
-    items: ["React.js", "Vite", "Tailwind CSS", "HTML5", "CSS3", "Streamlit"]
+    items: ["React.js", "Tailwind CSS", "HTML5", "CSS3",]
   },
   {
     category: "Backend & APIs",
@@ -162,11 +162,11 @@ export const skillsData = [
   },
   {
     category: "AI & Data",
-    items: ["RAG Architecture", "LangChain", "LLMs", "PyPDF", "Pandas"]
+    items: ["RAG Architecture", "LangChain", "LLMs", "Pandas"]
   },
   {
     category: "Cloud & Tools",
-    items: ["Git", "GitHub", "Vercel", "Render", "Postman", "VS Code", "Android"]
+    items: [ "GitHub", "Vercel", "Render", "VS Code", "Android"]
   }
 ];
 

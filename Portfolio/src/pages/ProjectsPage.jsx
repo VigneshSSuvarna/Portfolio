@@ -30,7 +30,7 @@ export default function ProjectsPage({ isDark, setCurrentPage, setPreviousPage }
 
         {/* Search Bar */}
         <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border w-full md:w-64 transition-colors ${
-          isDark ? 'bg-neutral-900 border-neutral-800 focus-within:border-[#39d353]' : 'bg-white border-neutral-200 focus-within:border-emerald-600'
+          isDark ? 'bg-neutral-900 border-neutral-800 focus-within:border-neutral-500' : 'bg-white border-neutral-200 focus-within:border-neutral-400'
         }`}>
           <Search size={16} className={isDark ? 'text-neutral-500' : 'text-neutral-400'} />
           <input 
@@ -51,7 +51,7 @@ export default function ProjectsPage({ isDark, setCurrentPage, setPreviousPage }
             onClick={() => setProjectFilter(cat)}
             className={`px-3 py-1.5 rounded-full text-xs font-mono transition-colors border cursor-pointer ${
               projectFilter === cat 
-                ? (isDark ? 'bg-[#39d353]/10 border-[#39d353] text-[#39d353]' : 'bg-emerald-500/10 border-emerald-600 text-emerald-700')
+                ? (isDark ? 'bg-white border-white text-black' : 'bg-neutral-900 border-neutral-900 text-white')
                 : (isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white' : 'bg-white border-neutral-200 text-neutral-600 hover:text-black')
             }`}
           >
@@ -78,17 +78,17 @@ export default function ProjectsPage({ isDark, setCurrentPage, setPreviousPage }
               }}
               className={`p-6 sm:p-8 rounded-xl border transition-all flex flex-col sm:flex-row sm:justify-between gap-4 shadow-sm cursor-pointer group ${
                 isDark
-                  ? 'bg-neutral-900/40 border-[#39d353] hover:shadow-[0_0_15px_rgba(57,211,83,0.15)]'
-                  : 'bg-white border-emerald-600 hover:shadow-md'
+                  ? 'bg-neutral-900/40 border-neutral-800 hover:border-neutral-600'
+                  : 'bg-white border-neutral-200 hover:border-neutral-400 hover:shadow-md'
               }`}
             >
               <div className="space-y-3 max-w-2xl">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h2 className={`text-lg sm:text-xl font-semibold group-hover:text-[#39d353] transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                  <h2 className={`text-lg sm:text-xl font-semibold group-hover:underline underline-offset-4 transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
                     {project.title}
                   </h2>
                   {project.category && (
-                    <span className={`text-xs font-mono px-2.5 py-1 rounded bg-emerald-500/10 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
+                    <span className={`text-xs font-mono px-2.5 py-1 rounded ${isDark ? 'bg-neutral-800 text-neutral-300' : 'bg-neutral-100 text-neutral-700'}`}>
                       {project.category}
                     </span>
                   )}
@@ -111,7 +111,7 @@ export default function ProjectsPage({ isDark, setCurrentPage, setPreviousPage }
                   source <ArrowUpRight size={15} />
                 </a>
                 {project.demo !== "#" && (
-                  <a href={project.demo} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-[#39d353] hover:text-white' : 'text-emerald-600 hover:text-emerald-900'}`}>
+                  <a href={project.demo} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-white hover:text-neutral-300' : 'text-neutral-900 hover:text-black'}`}>
                     live demo <ArrowUpRight size={15} />
                   </a>
                 )}
