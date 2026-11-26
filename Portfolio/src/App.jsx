@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Terminal, Command } from 'lucide-react';
+import { Sun, Moon, Terminal, Mail } from 'lucide-react';
 import { VALID_PAGES, PAGE_TITLES, personalInfo } from './data/portfolioData';
 
 // Pages
@@ -85,22 +85,48 @@ export default function App() {
   }, [isTerminalOpen, showResumeModal]);
 
   return (
-    <div className={`min-h-screen font-sans antialiased flex flex-col transition-colors duration-200 ${isDark ? 'bg-[#111111] text-[#e5e5e5] selection:bg-neutral-700 selection:text-white' : 'bg-[#fafafa] text-[#171717] selection:bg-neutral-200 selection:text-black'}`}>
-      <header className={`w-full px-6 sm:px-12 pt-8 sm:pt-10 pb-6 border-b flex justify-between items-center ${isDark ? 'border-neutral-800/80' : 'border-neutral-200'}`}>
-        <button onClick={() => setCurrentPage('home')} className={`font-mono text-base sm:text-lg font-semibold tracking-tight cursor-pointer transition-colors ${isDark ? 'text-white hover:text-neutral-300' : 'text-neutral-900 hover:text-neutral-600'}`}>
+    <div className={`min-h-screen font-sans antialiased flex flex-col ${isDark ? 'bg-[#141413] text-[#e5e5e5] selection:bg-white selection:text-black' : 'bg-[#ffffff] text-[#171717] selection:bg-black selection:text-white'}`}>
+      <header className="w-full max-w-3xl mx-auto px-6 pt-10 pb-4 flex justify-between items-center">
+        <button
+          onClick={() => setCurrentPage('home')}
+          className={`font-sans text-sm font-medium cursor-pointer ${isDark ? 'text-[#a3a3a3] hover:text-white' : 'text-[#525252] hover:text-black'}`}
+        >
           {personalInfo.fullName}
         </button>
 
-        <nav className="flex items-center gap-6 sm:gap-8 text-sm sm:text-base font-mono">
-          <button onClick={() => setCurrentPage('home')} className={`cursor-pointer transition-colors ${currentPage === 'home' ? (isDark ? 'text-white underline underline-offset-4 decoration-neutral-400' : 'text-neutral-900 underline underline-offset-4 decoration-neutral-500') : (isDark ? 'text-neutral-400 hover:text-neutral-200' : 'text-neutral-500 hover:text-neutral-900')}`}>about</button>
-          <button onClick={() => setCurrentPage('projects')} className={`cursor-pointer transition-colors ${currentPage === 'projects' ? (isDark ? 'text-white underline underline-offset-4 decoration-neutral-400' : 'text-neutral-900 underline underline-offset-4 decoration-neutral-500') : (isDark ? 'text-neutral-400 hover:text-neutral-200' : 'text-neutral-500 hover:text-neutral-900')}`}>projects</button>
-          <button onClick={() => setIsDark(!isDark)} aria-label="Toggle theme" className={`p-2 rounded border cursor-pointer transition-colors ${isDark ? 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white hover:border-neutral-700' : 'border-neutral-200 bg-white text-neutral-600 hover:text-neutral-900 hover:border-neutral-300'}`}>
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+        <nav className="flex items-center gap-6 text-sm font-sans">
+          <button
+            onClick={() => setCurrentPage('home')}
+            className={`cursor-pointer ${currentPage === 'home' ? (isDark ? 'text-white underline underline-offset-4' : 'text-black underline underline-offset-4') : 'text-[#737373] hover:text-current'}`}
+          >
+            About
+          </button>
+          <button
+            onClick={() => setCurrentPage('projects')}
+            className={`cursor-pointer ${currentPage === 'projects' ? (isDark ? 'text-white underline underline-offset-4' : 'text-black underline underline-offset-4') : 'text-[#737373] hover:text-current'}`}
+          >
+            Projects
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsTerminalOpen(true)}
+            className="inline-flex items-center gap-1.5 cursor-pointer text-[#737373] hover:text-current"
+            title="Open console (Ctrl/Cmd + K)"
+          >
+            <Terminal size={14} />
+            <span>Console</span>
+          </button>
+          <button
+            onClick={() => setIsDark(!isDark)}
+            aria-label="Toggle theme"
+            className="cursor-pointer text-[#737373] hover:text-current p-1"
+          >
+            {isDark ? <Sun size={15} /> : <Moon size={15} />}
           </button>
         </nav>
       </header>
 
-      <main className="w-full px-6 sm:px-12 py-10 sm:py-16 flex-1 max-w-7xl mx-auto">
+      <main className="w-full max-w-3xl mx-auto px-6 py-10 flex-1">
         {currentPage === 'home' && <HomePage isDark={isDark} setCurrentPage={setCurrentPage} setPreviousPage={setPreviousPage} setShowResumeModal={setShowResumeModal} />}
         {currentPage === 'projects' && <ProjectsPage isDark={isDark} setCurrentPage={setCurrentPage} setPreviousPage={setPreviousPage} />}
         {currentPage === 'sama-foundation' && <SamaFoundationPage isDark={isDark} previousPage={previousPage} setCurrentPage={setCurrentPage} />}
@@ -111,20 +137,39 @@ export default function App() {
         {currentPage === 'project-kalki' && <KalkiPage isDark={isDark} setCurrentPage={setCurrentPage} />}
       </main>
 
-      <footer className={`w-full px-6 sm:px-12 py-6 sm:py-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm max-w-7xl mx-auto ${isDark ? 'border-neutral-800/80 text-[#8a8a8a]' : 'border-neutral-200 text-neutral-500'}`}>
-        <div className="text-center sm:text-left flex flex-wrap items-center justify-center sm:justify-start gap-4">
-          <span>© {new Date().getFullYear()} {personalInfo.name}. Built with React & Vite.</span>
-          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md font-mono text-xs border ${isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-300' : 'bg-neutral-100 border-neutral-200 text-neutral-700'}`}>
-<span className={`font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{visitorCount}</span>            <span>visitors</span>
-          </div>
+      <footer className={`w-full max-w-3xl mx-auto px-6 py-8 border-t flex flex-col sm:flex-row justify-between items-center gap-3 text-xs font-mono text-[#737373] ${isDark ? 'border-neutral-800/80' : 'border-neutral-200'}`}>
+        <div className="flex items-center gap-x-2.5 whitespace-nowrap">
+          <span>© {new Date().getFullYear()} {personalInfo.name}</span>
+          <span>·</span>
+          <span>{visitorCount} visitors</span>
+        </div>
+        <div className="flex items-center gap-4 whitespace-nowrap shrink-0">
+          <a href={`https://github.com/${personalInfo.githubHandle}`} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-1.5 ${isDark ? 'hover:text-white' : 'hover:text-black'}`}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+            <span>GitHub</span>
+          </a>
+          <a href={personalInfo.linkedinUrl} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-1.5 ${isDark ? 'hover:text-white' : 'hover:text-black'}`}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+            </svg>
+            <span>LinkedIn</span>
+          </a>
+          <a href={`https://codeforces.com/profile/${personalInfo.codeforcesHandle}`} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-1.5 ${isDark ? 'hover:text-white' : 'hover:text-black'}`}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <rect x="1.5" y="9" width="4.5" height="12" rx="1" />
+              <rect x="9.75" y="3" width="4.5" height="18" rx="1" />
+              <rect x="18" y="12" width="4.5" height="9" rx="1" />
+            </svg>
+            <span>Codeforces</span>
+          </a>
+          <a href={`mailto:${personalInfo.email}`} className={`inline-flex items-center gap-1.5 ${isDark ? 'hover:text-white' : 'hover:text-black'}`}>
+            <Mail size={13} />
+            <span>Email</span>
+          </a>
         </div>
       </footer>
-
-      <button type="button" onClick={() => setIsTerminalOpen(true)} className={`fixed bottom-6 right-6 flex items-center gap-2 font-mono text-xs z-40 px-3 py-2 rounded-lg border shadow-lg cursor-pointer transition-all ${isDark ? 'bg-neutral-900/90 border-neutral-800 text-neutral-300 hover:border-neutral-600 hover:text-white' : 'bg-white/90 border-neutral-300 text-neutral-700 hover:border-neutral-500 hover:text-black'}`}>
-  <Terminal size={13} className={isDark ? 'text-neutral-300' : 'text-neutral-700'} />
-        <span>console</span>
-        <kbd className={`hidden sm:inline-flex px-1.5 py-0.5 rounded border items-center gap-0.5 text-[10px] ${isDark ? 'bg-neutral-800 border-neutral-700 text-neutral-400' : 'bg-neutral-100 border-neutral-300 text-neutral-500'}`}><Command size={9} /> K</kbd>
-      </button>
 
       <TerminalModal isOpen={isTerminalOpen} onClose={() => setIsTerminalOpen(false)} setCurrentPage={setCurrentPage} setShowResumeModal={setShowResumeModal} isDark={isDark} />
       <ResumeModal isOpen={showResumeModal} onClose={() => setShowResumeModal(false)} isDark={isDark} />

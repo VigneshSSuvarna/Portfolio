@@ -2,33 +2,34 @@ import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
 
 export const CaseStudyMetaBar = ({ role, domain, status, github, demo, isDark }) => {
+  const hairline = isDark ? 'border-neutral-800' : 'border-neutral-200';
+  const headingText = isDark ? 'text-white' : 'text-black';
+
   return (
-    <div className={`grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 sm:p-5 rounded-xl border font-mono text-xs ${
-      isDark ? 'bg-neutral-900/60 border-neutral-800' : 'bg-neutral-50 border-neutral-200'
-    }`}>
+    <div className={`grid grid-cols-2 sm:grid-cols-4 gap-6 py-4 border-t border-b font-mono text-xs ${hairline}`}>
       <div>
-        <div className="text-neutral-500 uppercase mb-1">Role</div>
-        <div className={`font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{role}</div><div className={`font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{status}</div>
+        <div className="text-[#737373] uppercase mb-1">Role</div>
+        <div className={`font-medium ${headingText}`}>{role}</div>
       </div>
       <div>
-        <div className="text-neutral-500 uppercase mb-1">Domain</div>
-        <div className={`font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>{domain}</div>
+        <div className="text-[#737373] uppercase mb-1">Domain</div>
+        <div className={`font-medium ${headingText}`}>{domain}</div>
       </div>
       <div>
-        <div className="text-neutral-500 uppercase mb-1">Status</div>
-        <div className="text-[#39d353] font-semibold">{status}</div>
+        <div className="text-[#737373] uppercase mb-1">Status</div>
+        <div className={`font-medium ${headingText}`}>{status}</div>
       </div>
       <div>
-        <div className="text-neutral-500 uppercase mb-1">Links</div>
-        <div className="flex items-center gap-3">
+        <div className="text-[#737373] uppercase mb-1">Links</div>
+        <div className="flex items-center gap-4">
           {github && (
             <a
               href={github}
               target="_blank"
               rel="noreferrer"
               className={`inline-flex items-center gap-1 underline underline-offset-4 ${
-  isDark ? 'text-white hover:text-neutral-300' : 'text-neutral-900 hover:text-black'
-}`}
+                isDark ? 'text-[#e5e5e5] hover:text-white' : 'text-[#171717] hover:text-black'
+              }`}
             >
               GitHub <ArrowUpRight size={13} />
             </a>
@@ -38,7 +39,7 @@ export const CaseStudyMetaBar = ({ role, domain, status, github, demo, isDark })
               href={demo}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1 text-[#39d353] underline underline-offset-4"
+              className={`inline-flex items-center gap-1 underline underline-offset-4 ${headingText}`}
             >
               Live <ArrowUpRight size={13} />
             </a>

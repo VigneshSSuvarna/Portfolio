@@ -11,48 +11,54 @@ export default function ProjectsPage({ isDark, setCurrentPage, setPreviousPage }
 
   const filteredProjects = projectsData.filter(project => {
     const matchesFilter = projectFilter === 'All' || project.category === projectFilter;
-    const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           project.techStack.some(tech => tech.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesFilter && matchesSearch;
   });
+
+  const hairline = isDark ? 'border-neutral-800' : 'border-neutral-200';
+  const divider = isDark ? 'divide-neutral-800' : 'divide-neutral-200';
+  const headingText = isDark ? 'text-white' : 'text-black';
+  const mutedText = 'text-[#737373]';
+  const bodyText = isDark ? 'text-[#a3a3a3]' : 'text-[#525252]';
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+          <h1 className={`text-2xl sm:text-3xl font-semibold tracking-tight ${headingText}`}>
             Projects
           </h1>
-          <p className={`text-sm sm:text-base mt-1 ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+          <p className={`text-sm mt-1 ${bodyText}`}>
             Selected full-stack applications, AI systems, and tools I've built.
           </p>
         </div>
 
         {/* Search Bar */}
-        <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border w-full md:w-64 transition-colors ${
-          isDark ? 'bg-neutral-900 border-neutral-800 focus-within:border-neutral-500' : 'bg-white border-neutral-200 focus-within:border-neutral-400'
+        <div className={`flex items-center gap-2 pb-1.5 border-b w-full md:w-64 ${
+          isDark ? 'border-neutral-800 focus-within:border-neutral-400' : 'border-neutral-200 focus-within:border-neutral-600'
         }`}>
-          <Search size={16} className={isDark ? 'text-neutral-500' : 'text-neutral-400'} />
-          <input 
+          <Search size={14} className={mutedText} />
+          <input
             type="text"
-            placeholder="Search tech stack..."
+            placeholder="Filter by name or stack..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`bg-transparent border-none outline-none text-sm w-full font-mono ${isDark ? 'text-white placeholder-neutral-600' : 'text-neutral-900 placeholder-neutral-400'}`}
+            className={`bg-transparent border-none outline-none text-xs w-full font-mono ${isDark ? 'text-white placeholder-[#737373]' : 'text-black placeholder-[#737373]'}`}
           />
         </div>
       </div>
 
-      {/* Filter Chips */}
-      <div className="flex flex-wrap gap-2">
+      {/* Category Filter Tabs */}
+      <div className={`flex flex-wrap gap-x-6 gap-y-2 border-b pb-3 ${hairline}`}>
         {projectCategories.map(cat => (
           <button
             key={cat}
             onClick={() => setProjectFilter(cat)}
-            className={`px-3 py-1.5 rounded-full text-xs font-mono transition-colors border cursor-pointer ${
-              projectFilter === cat 
-                ? (isDark ? 'bg-white border-white text-black' : 'bg-neutral-900 border-neutral-900 text-white')
-                : (isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white' : 'bg-white border-neutral-200 text-neutral-600 hover:text-black')
+            className={`text-xs font-mono transition-colors cursor-pointer ${
+              projectFilter === cat
+                ? `${headingText} underline underline-offset-4`
+                : `${mutedText} hover:${headingText}`
             }`}
           >
             {cat}
@@ -60,14 +66,14 @@ export default function ProjectsPage({ isDark, setCurrentPage, setPreviousPage }
         ))}
       </div>
 
-      {/* Filtered Projects Map */}
-      <div className="flex flex-col gap-6">
-        {filteredProjects.length === 0 ? (
-          <div className={`p-8 text-center font-mono text-sm border rounded-xl border-dashed ${isDark ? 'border-neutral-800 text-neutral-500' : 'border-neutral-300 text-neutral-400'}`}>
-            No projects found matching your criteria.
-          </div>
-        ) : (
-          filteredProjects.map((project) => (
+      {/* Filtered Projects List */}
+      {filteredProjects.length === 0 ? (
+        <div className={`py-12 text-center font-mono text-xs border-t border-b ${hairline} ${mutedText}`}>
+          No projects found matching your criteria.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredProjects.map((project) => (
             <div
               key={project.id}
               onClick={() => {
@@ -76,50 +82,53 @@ export default function ProjectsPage({ isDark, setCurrentPage, setPreviousPage }
                   setCurrentPage(project.pageKey);
                 }
               }}
-              className={`p-6 sm:p-8 rounded-xl border transition-all flex flex-col sm:flex-row sm:justify-between gap-4 shadow-sm cursor-pointer group ${
+              className={`border rounded-md px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 cursor-pointer group transition-colors ${
                 isDark
-                  ? 'bg-neutral-900/40 border-neutral-800 hover:border-neutral-600'
-                  : 'bg-white border-neutral-200 hover:border-neutral-400 hover:shadow-md'
+                  ? 'border-neutral-800 hover:border-neutral-600'
+                  : 'border-neutral-200 hover:border-neutral-400'
               }`}
             >
-              <div className="space-y-3 max-w-2xl">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <h2 className={`text-lg sm:text-xl font-semibold group-hover:underline underline-offset-4 transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+              <div className="space-y-1.5 max-w-xl">
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <h2 className={`text-base font-medium group-hover:underline underline-offset-4 ${headingText}`}>
                     {project.title}
                   </h2>
-                  {project.category && (
-                    <span className={`text-xs font-mono px-2.5 py-1 rounded ${isDark ? 'bg-neutral-800 text-neutral-300' : 'bg-neutral-100 text-neutral-700'}`}>
-                      {project.category}
-                    </span>
-                  )}
                   <LiveStatusBadge url={project.demo} isDark={isDark} />
                 </div>
-                <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                <p className={`text-sm leading-relaxed ${bodyText}`}>
                   {project.description}
                 </p>
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {project.techStack.map((tech) => (
-                    <span key={tech} className={`text-xs sm:text-sm font-mono border px-2.5 py-1 rounded ${isDark ? 'text-neutral-400 bg-neutral-900 border-neutral-800' : 'text-neutral-700 bg-neutral-100 border-neutral-200'}`}>
-                      {tech}
-                    </span>
-                  ))}
+                <div className={`text-xs font-mono ${mutedText}`}>
+                  {project.techStack.join(' · ')}
                 </div>
               </div>
 
-              <div className="flex sm:flex-col items-start sm:items-end justify-start gap-3 text-xs sm:text-sm font-mono shrink-0 pt-1">
-                <a href={project.github} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-600 hover:text-neutral-900'}`}>
-                  source <ArrowUpRight size={15} />
+              <div className="flex sm:flex-col items-start sm:items-end justify-start gap-2 text-xs font-mono shrink-0">
+                <a
+                  href={project.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className={`inline-flex items-center gap-1 underline underline-offset-4 ${isDark ? 'text-[#a3a3a3] hover:text-white' : 'text-[#525252] hover:text-black'}`}
+                >
+                  Source <ArrowUpRight size={13} />
                 </a>
                 {project.demo !== "#" && (
-                  <a href={project.demo} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className={`flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-white hover:text-neutral-300' : 'text-neutral-900 hover:text-black'}`}>
-                    live demo <ArrowUpRight size={15} />
+                  <a
+                    href={project.demo}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className={`inline-flex items-center gap-1 underline underline-offset-4 ${headingText}`}
+                  >
+                    Live Demo <ArrowUpRight size={13} />
                   </a>
                 )}
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

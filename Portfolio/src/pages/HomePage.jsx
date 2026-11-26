@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { 
-  X, ArrowUpRight, Download, Calendar, 
-  Terminal, Compass, Code2, Award, Eye, Copy, Check 
+import {
+  X, ChevronRight, Download, Calendar,
+  Eye, Copy, Check
 } from 'lucide-react';
 import { experienceData, achievementsData, skillsData, INITIAL_CF_SUBMISSIONS, personalInfo } from '../data/portfolioData';
 import { formatDisplayDate, toLocalDateKey, computeMaxStreak, buildCalendarWeeks } from '../utils/calendarUtils';
@@ -261,8 +261,8 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
 
   const mainCalendarWeeks = useMemo(() => buildCalendarWeeks('rolling'), []);
 
-  const getGitHubCellColor = (count) => {
-    if (count <= 0) return isDark ? "bg-[#161b22]" : "bg-[#ebedf0]";
+  const getHeatmapCellColor = (count) => {
+    if (count <= 0) return isDark ? "bg-[#1f1f1f]" : "bg-[#ebedf0]";
     if (count === 1) return isDark ? "bg-[#0e4429]" : "bg-[#9be9a8]";
     if (count <= 3) return isDark ? "bg-[#006d32]" : "bg-[#40c463]";
     if (count <= 5) return isDark ? "bg-[#26a641]" : "bg-[#30a14e]";
@@ -279,137 +279,110 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
     setTimeout(() => setCopiedEmail(false), 2000);
   };
 
+  const hairline = isDark ? 'border-neutral-800' : 'border-neutral-200';
+  const divider = isDark ? 'divide-neutral-800' : 'divide-neutral-200';
+  const mutedText = 'text-[#737373]';
+  const bodyText = isDark ? 'text-[#a3a3a3]' : 'text-[#525252]';
+  const headingText = isDark ? 'text-white' : 'text-black';
+
   return (
-    <div className="space-y-10 sm:space-y-12">
+    <div className="space-y-11">
       {/* HERO PROFILE SECTION */}
-      <section className={`p-6 sm:p-10 rounded-2xl border transition-all shadow-sm ${
-        isDark ? 'bg-neutral-900/40 border-neutral-800' : 'bg-white border-neutral-200'
-      }`}>
-        <div className="flex flex-col items-center text-center gap-6">
-          <img
-            src={personalInfo.profilePicture}
-            alt={personalInfo.name}
-            className={`w-28 h-28 sm:w-32 sm:h-32 rounded-2xl object-cover border-2 shrink-0 shadow-md ${
-              isDark ? 'border-neutral-700 bg-neutral-900' : 'border-neutral-200 bg-neutral-100'
-            }`}
-          />
-          <div className="space-y-4 w-full max-w-2xl">
-            <div>
-              <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                {personalInfo.name}
-              </h1>
-              <p className={`text-sm sm:text-base font-medium mt-1 ${isDark ? 'text-neutral-300' : 'text-neutral-700'}`}>
-                {personalInfo.role} @ {personalInfo.university}
-              </p>
-            </div>
-            <p className={`text-sm sm:text-lg leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
-              {personalInfo.shortBio}
-            </p>
-            <div className="pt-2 flex flex-wrap justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setShowResumeModal(true)}
-                className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono px-4 py-2.5 rounded-lg border font-medium cursor-pointer transition-colors ${
-                  isDark
-                    ? 'border-white bg-white text-black hover:bg-neutral-200'
-                    : 'border-neutral-900 bg-neutral-900 text-white hover:bg-neutral-800'
-                }`}
-              >
-                <Eye size={16} /> Preview Resume
-              </button>
+      <section className="flex flex-col items-center text-center space-y-4">
+        <img
+          src={personalInfo.profilePicture}
+          alt={personalInfo.name}
+          className={`w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border ${
+            isDark ? 'border-neutral-800 bg-[#1f1f1f]' : 'border-neutral-200 bg-neutral-100'
+          }`}
+        />
+        <div>
+          <h1 className={`text-4xl sm:text-[42px] font-bold tracking-tight ${headingText}`}>
+            {personalInfo.name}
+          </h1>
+          <p className={`text-sm font-mono mt-1.5 ${mutedText}`}>
+            {personalInfo.role} · {personalInfo.university}
+          </p>
+        </div>
+        <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-sm font-mono">
+          <button
+            type="button"
+            onClick={() => setShowResumeModal(true)}
+            className={`inline-flex items-center gap-1.5 underline underline-offset-4 cursor-pointer ${headingText}`}
+          >
+            <Eye size={15} /> Preview Resume
+          </button>
 
-              <a
-                href={personalInfo.resumePath}
-                download
-                className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono px-4 py-2.5 rounded-lg border font-medium transition-colors ${
-                  isDark
-                    ? 'border-neutral-700 bg-neutral-800 text-neutral-200 hover:bg-neutral-700 hover:text-white'
-                    : 'border-neutral-300 bg-neutral-100 text-neutral-800 hover:bg-neutral-200 hover:text-black'
-                }`}
-              >
-                <Download size={16} /> Download Resume
-              </a>
+          <a
+            href={personalInfo.resumePath}
+            download
+            className={`inline-flex items-center gap-1.5 underline underline-offset-4 ${isDark ? 'text-[#a3a3a3] hover:text-white' : 'text-[#525252] hover:text-black'}`}
+          >
+            <Download size={15} /> Download PDF
+          </a>
 
-              <button
-                type="button"
-                onClick={handleCopyEmail}
-                className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono px-4 py-2.5 rounded-lg border font-medium cursor-pointer transition-colors ${
-                  isDark
-                    ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:border-neutral-700 hover:text-white'
-                    : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:text-black'
-                }`}
-              >
-                {copiedEmail ? <Check size={16} className={isDark ? 'text-white' : 'text-black'} /> : <Copy size={16} />}
-                {copiedEmail ? 'Copied Email!' : personalInfo.email}
-              </button>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={handleCopyEmail}
+            className={`inline-flex items-center gap-1.5 underline underline-offset-4 cursor-pointer ${isDark ? 'text-[#a3a3a3] hover:text-white' : 'text-[#525252] hover:text-black'}`}
+          >
+            {copiedEmail ? <Check size={15} className={headingText} /> : <Copy size={15} />}
+            {copiedEmail ? 'Copied' : personalInfo.email}
+          </button>
         </div>
       </section>
 
-      {/* BOX 1: BACKGROUND */}
-      <div className={`p-6 sm:p-8 rounded-2xl border transition-all shadow-sm ${
-        isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
-      }`}>
-        <div className="flex items-center gap-2 mb-4">
-          <Terminal size={20} className={isDark ? 'text-white' : 'text-neutral-900'} />
-          <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-            Background
-          </h2>
-        </div>
-        <ul className={`space-y-3 text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
-          <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
-            <span>I am a 3rd-year Computer Science & Engineering undergraduate.</span>
+      {/* BACKGROUND */}
+      <section className="space-y-4">
+        <h2 className={`text-xl sm:text-2xl font-semibold ${headingText}`}>
+          Background
+        </h2>
+        <ul className={`list-disc pl-6 space-y-2.5 text-base sm:text-[17px] leading-relaxed ${bodyText}`}>
+          <li>
+            I am a 3rd-year Computer Science & Engineering undergraduate.
           </li>
-          <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
-            <span>Currently working on full-stack web architectures and applied AI systems, focusing on backend scalability, asynchronous processing, and intelligent document retrieval.</span>
+          <li>
+            Currently working on full-stack web architectures and applied AI systems, focusing on backend scalability, asynchronous processing, and intelligent document retrieval.
           </li>
-          <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
-            <span>Driven by clean system design, I enjoy translating complex real-world problems into reliable, low-latency, and production-ready software.</span>
+          <li>
+            Driven by clean system design, I enjoy translating complex real-world problems into reliable, low-latency, and production-ready software.
           </li>
         </ul>
-      </div>
+      </section>
 
-      {/* BOX 2: AREAS OF EXPLORATION */}
-      <div className={`p-6 sm:p-8 rounded-2xl border transition-all shadow-sm ${
-        isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
-      }`}>
-        <div className="flex items-center gap-2 mb-4">
-          <Compass size={20} className={isDark ? 'text-white' : 'text-neutral-900'} />
-          <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-            Areas of Exploration
-          </h2>
-        </div>
-        <ul className={`space-y-3 text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
-          <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
-            <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>Competitive Programming:</strong> I actively practice algorithmic problem-solving on Codeforces, primarily writing solutions in C++ and Python.</span>
+      {/* AREAS OF EXPLORATION */}
+      <section className="space-y-4">
+        <h2 className={`text-xl sm:text-2xl font-semibold ${headingText}`}>
+          Areas of Exploration
+        </h2>
+        <ul className={`list-disc pl-6 space-y-2.5 text-base sm:text-[17px] leading-relaxed ${bodyText}`}>
+          <li>
+            Competitive Programming. I actively participate in Codeforces contests, primarily writing solutions in C++ and Python.
           </li>
-          <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
-            <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>AI Architecture & Full-Stack Systems:</strong> Designing Retrieval-Augmented Generation (RAG) pipelines, working with vector embeddings, and deploying scalable backend infrastructure.</span>
+          <li>
+            AI Infrastructure & Full-Stack Systems. Designing RAG pipelines, working with vector embeddings, and deploying scalable backend infrastructure.
           </li>
-          <li className="flex items-start gap-3">
-            <span className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 ${isDark ? 'bg-white' : 'bg-neutral-900'}`} />
-            <span><strong className={isDark ? 'text-white' : 'text-neutral-900'}>Beyond Coding:</strong> Exploring new AI capabilities, building accessible applications, and unwinding with video games.</span>
+          <li>
+            Beyond Coding. Exploring new AI capabilities, building accessible applications, and unwinding with video games.
           </li>
         </ul>
-      </div>
+      </section>
 
-      {/* BOX 3: EXPERIENCE & ONGOING WORK */}
-      <div className={`p-6 sm:p-8 rounded-2xl border transition-all shadow-sm ${
-        isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
-      }`}>
-        <div className="flex items-center gap-2 mb-6">
-          <Code2 size={20} className={isDark ? 'text-white' : 'text-neutral-900'} />
-          <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+      {/* ONGOING WORK */}
+      <section className="space-y-4">
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className={`text-xl sm:text-2xl font-semibold ${headingText}`}>
             Ongoing Work
           </h2>
+          <button
+            type="button"
+            onClick={() => setCurrentPage('projects')}
+            className={`text-sm underline underline-offset-4 cursor-pointer ${isDark ? 'text-[#a3a3a3] hover:text-white' : 'text-[#525252] hover:text-black'}`}
+          >
+            See all projects
+          </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-3">
           {experienceData.map((exp) => {
             const isSama = exp.organization.includes("Sama Foundation");
             const isCit = exp.organization.includes("Dr. S. R. Chandrasekhar Institute of Speech and Hearing");
@@ -417,129 +390,96 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
               <div
                 key={exp.id}
                 onClick={() => {
-                  setPreviousPage('home'); 
+                  setPreviousPage('home');
                   if (isSama) setCurrentPage('sama-foundation');
                   if (isCit) setCurrentPage('cit-hearingaid');
                 }}
-                className={`p-6 rounded-xl border transition-all cursor-pointer group flex flex-col justify-between ${
-                  isDark 
-                    ? 'bg-neutral-900/60 border-neutral-800 hover:border-neutral-500' 
-                    : 'bg-neutral-50 border-neutral-200 hover:border-neutral-400'
+                className={`border rounded-md px-5 py-4 flex items-center justify-between gap-4 cursor-pointer transition-colors ${
+                  isDark
+                    ? 'border-neutral-800 hover:border-neutral-600'
+                    : 'border-neutral-200 hover:border-neutral-400'
                 }`}
               >
-                <div>
-                  <div className="flex justify-between items-start gap-2 mb-2">
-                    <h3 className={`font-semibold text-lg group-hover:underline underline-offset-4 transition-colors ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                      {exp.organization}
-                    </h3>
-                    <ArrowUpRight size={18} className={`text-neutral-500 shrink-0 transition-colors ${isDark ? 'group-hover:text-white' : 'group-hover:text-black'}`} />
+                <div className="space-y-1">
+                  <div className={`font-medium text-base sm:text-lg ${headingText}`}>
+                    {exp.projectTitle}
                   </div>
-                  <span className={`text-xs font-mono px-2.5 py-1 rounded inline-block mb-3 ${
-                    isDark ? 'bg-neutral-800 text-neutral-200' : 'bg-neutral-200 text-neutral-800'
-                  }`}>
-                    {exp.role}
-                  </span>
-                  <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
-                    {exp.description}
-                  </p>
+                  <div className={`text-sm font-mono ${mutedText}`}>
+                    {exp.organization} · {exp.role}
+                  </div>
                 </div>
-                <div className={`mt-6 pt-4 border-t border-neutral-800/40 text-xs sm:text-sm font-mono flex items-center justify-between ${
-                  isDark ? 'text-neutral-200 group-hover:text-white' : 'text-neutral-800 group-hover:text-black'
-                }`}>
-                  <span>View {exp.projectTitle}</span>
-                  <span>→</span>
-                </div>
+                <ChevronRight size={18} className={mutedText} />
               </div>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* BOX 4: LEADERSHIP & ACHIEVEMENTS */}
-      <div className={`p-6 sm:p-8 rounded-2xl border transition-all shadow-sm ${
-        isDark ? 'bg-neutral-900/30 border-neutral-800' : 'bg-white border-neutral-200'
-      }`}>
-        <div className="flex items-center gap-2 mb-6">
-          <Award size={20} className={isDark ? 'text-white' : 'text-neutral-900'} />
-          <h2 className={`text-sm sm:text-base font-mono uppercase tracking-wider font-semibold ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-            Leadership & Highlights
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* LEADERSHIP & HIGHLIGHTS */}
+      <section className="space-y-4">
+        <h2 className={`text-xl sm:text-2xl font-semibold ${headingText}`}>
+          Leadership & Highlights
+        </h2>
+        <ul className={`list-disc pl-6 space-y-2.5 text-base sm:text-[17px] leading-relaxed ${bodyText}`}>
           {achievementsData.map((item) => (
-            <div
-              key={item.id}
-              className={`p-5 rounded-xl border ${
-                isDark ? 'bg-neutral-900/50 border-neutral-800' : 'bg-neutral-50 border-neutral-200'
-              }`}
-            >
-              <div className={`font-semibold text-sm sm:text-base mb-1 ${isDark ? 'text-white' : 'text-neutral-900'}`}>
-                {item.title}
-              </div>
-              <div className={`text-xs font-mono mb-2.5 ${isDark ? 'text-neutral-300' : 'text-neutral-600'}`}>
-                {item.subtitle}
-              </div>
-              <p className={`text-xs sm:text-sm leading-relaxed ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
-                {item.description}
-              </p>
-            </div>
+            <li key={item.id}>
+              <span className={headingText}>{item.title}</span> — {item.description}
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      </section>
 
-      <hr className={isDark ? 'border-neutral-800/80' : 'border-neutral-200'} />
-
-      {/* Coding Activity Section */}
+      {/* CODING ACTIVITY */}
       <section className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-          <h2 className={`text-xs sm:text-sm font-mono uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+          <h2 className={`text-xl sm:text-2xl font-semibold ${headingText}`}>
             Coding Activity
           </h2>
-          <div className="flex gap-4 text-xs sm:text-sm font-mono">
+          <div className="flex gap-5 text-sm font-mono">
             <button
               onClick={() => setActiveHeatmap('github')}
               className={`cursor-pointer ${
                 activeHeatmap === 'github'
-                  ? isDark ? 'text-white underline underline-offset-4' : 'text-neutral-900 underline underline-offset-4'
-                  : isDark ? 'text-neutral-500 hover:text-neutral-300' : 'text-neutral-400 hover:text-neutral-700'
+                  ? `${headingText} underline underline-offset-4`
+                  : `${mutedText} hover:text-current`
               }`}
             >
-              github
+              GitHub
             </button>
             <button
               onClick={() => setActiveHeatmap('codeforces')}
               className={`cursor-pointer ${
                 activeHeatmap === 'codeforces'
-                  ? isDark ? 'text-white underline underline-offset-4' : 'text-neutral-900 underline underline-offset-4'
-                  : isDark ? 'text-neutral-500 hover:text-neutral-300' : 'text-neutral-400 hover:text-neutral-700'
+                  ? `${headingText} underline underline-offset-4`
+                  : `${mutedText} hover:text-current`
               }`}
             >
-              codeforces
+              Codeforces
             </button>
           </div>
         </div>
 
-        <div className={`border rounded p-6 ${isDark ? 'border-neutral-800 bg-[#0d1117] text-[#c9d1d9]' : 'border-neutral-200 bg-white text-neutral-800'}`}>
+        <div className={`py-1 ${isDark ? 'text-[#e5e5e5]' : 'text-[#171717]'}`}>
           {activeHeatmap === 'github' ? (
             <>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs sm:text-sm mb-2 font-mono gap-1">
-                <a href={`https://github.com/${personalInfo.githubHandle}`} target="_blank" rel="noreferrer" className={`hover:underline ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs mb-3 font-mono gap-1">
+                <a href={`https://github.com/${personalInfo.githubHandle}`} target="_blank" rel="noreferrer" className={`hover:underline underline-offset-4 ${mutedText}`}>
                   github.com/{personalInfo.githubHandle}
                 </a>
-                <span className={isDark ? 'text-[#8b949e]' : 'text-neutral-500'}>
-                  {ghTotal > 0 ? `${ghTotal} contributions • ` : ''}up to {formatDisplayDate(toLocalDateKey(new Date()))}
+                <span className={mutedText}>
+                  {ghTotal > 0 ? `${ghTotal} contributions · ` : ''}up to {formatDisplayDate(toLocalDateKey(new Date()))}
                 </span>
               </div>
 
               <div className="space-y-3">
-                <div className={`overflow-x-auto overflow-y-hidden pb-3 border-b ${isDark ? 'border-neutral-800' : 'border-neutral-200'}`}>
-                  <div className="pt-6 w-full flex justify-center">
+                <div className={`overflow-x-auto overflow-y-hidden pb-3 border-b ${hairline}`}>
+                  <div className="pt-5 w-full flex justify-center">
                     <div className="flex flex-col">
                       <div className="flex gap-[3px] pl-8 mb-1.5 h-4 items-end">
                         {mainCalendarWeeks.map((week) => (
                           <div key={week.weekIdx} className="w-[13px] relative shrink-0">
                             {week.monthLabel && (
-                              <span className={`absolute bottom-0 left-0 text-[11px] font-mono leading-none select-none ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                              <span className={`absolute bottom-0 left-0 text-[11px] font-mono leading-none select-none ${mutedText}`}>
                                 {week.monthLabel}
                               </span>
                             )}
@@ -548,7 +488,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                       </div>
 
                       <div className="flex gap-2 items-start">
-                        <div className={`flex flex-col gap-[3px] text-[11px] font-mono w-6 shrink-0 select-none ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                        <div className={`flex flex-col gap-[3px] text-[11px] font-mono w-6 shrink-0 select-none ${mutedText}`}>
                           <span className="h-[13px] leading-[13px] opacity-0">Sun</span>
                           <span className="h-[13px] leading-[13px]">Mon</span>
                           <span className="h-[13px] leading-[13px] opacity-0">Tue</span>
@@ -564,7 +504,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                               {week.days.map((day) => {
                                 const count = activeDataMap[day.dateStr] || 0;
                                 const isSelected = selectedDateStr === day.dateStr;
-                                const colorClass = getGitHubCellColor(count);
+                                const colorClass = getHeatmapCellColor(count);
 
                                 return (
                                   <div key={day.dateStr} className="relative">
@@ -573,17 +513,17 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                                       onClick={() => setSelectedDateStr(prev => (prev === day.dateStr ? null : day.dateStr))}
                                       aria-label={`${formatDisplayDate(day.dateStr)}: ${count} ${unitLabel}${count === 1 ? '' : 's'}`}
                                       title={`${formatDisplayDate(day.dateStr)} — ${count} ${unitLabel}${count === 1 ? '' : 's'}`}
-                                      className={`block w-[13px] h-[13px] rounded-[3px] cursor-pointer transition-transform duration-150 focus:outline-none ${colorClass} ${
+                                      className={`block w-[13px] h-[13px] rounded-[2px] cursor-pointer transition-transform duration-150 focus:outline-none ${colorClass} ${
                                         isSelected
-                                          ? isDark ? 'ring-2 ring-white scale-125 z-20 relative' : 'ring-2 ring-neutral-900 scale-125 z-20 relative'
+                                          ? isDark ? 'ring-1 ring-white scale-125 z-20 relative' : 'ring-1 ring-black scale-125 z-20 relative'
                                           : 'hover:scale-125 hover:z-10'
                                       }`}
                                     />
                                     {isSelected && (
-                                      <div className="absolute bottom-full mb-2 z-30 px-2.5 py-1 rounded text-[11px] font-mono whitespace-nowrap shadow-lg pointer-events-none border bg-neutral-900 text-white border-neutral-700">
+                                      <div className={`absolute bottom-full mb-2 z-30 px-2.5 py-1 rounded-sm text-[11px] font-mono whitespace-nowrap pointer-events-none border ${isDark ? 'bg-[#171717] text-white border-neutral-700' : 'bg-white text-black border-neutral-300'}`}>
                                         <span className="font-semibold">{formatDisplayDate(day.dateStr)}</span>
-                                        <span className="text-neutral-400"> • </span>
-                                        <span className="text-white font-semibold">{count} {unitLabel}{count === 1 ? '' : 's'}</span>
+                                        <span className={mutedText}> · </span>
+                                        <span className="font-semibold">{count} {unitLabel}{count === 1 ? '' : 's'}</span>
                                       </div>
                                     )}
                                   </div>
@@ -599,27 +539,27 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
 
                 <div className="flex flex-wrap justify-between items-center gap-3 text-xs font-mono pt-1">
                   {selectedDateStr ? (
-                    <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded border ${isDark ? 'bg-neutral-900/90 border-neutral-800 text-neutral-200' : 'bg-neutral-100 border-neutral-200 text-neutral-800'}`}>
-                      <Calendar size={13} className={isDark ? 'text-white shrink-0' : 'text-neutral-900 shrink-0'} />
+                    <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-sm border ${isDark ? 'bg-[#171717] border-neutral-800 text-[#e5e5e5]' : 'bg-neutral-50 border-neutral-200 text-[#171717]'}`}>
+                      <Calendar size={12} className={`${headingText} shrink-0`} />
                       <span>
-                        <strong className={isDark ? 'text-white' : 'text-black'}>{formatDisplayDate(selectedDateStr)}</strong>
+                        <strong className={headingText}>{formatDisplayDate(selectedDateStr)}</strong>
                         {' — '}
                         {selectedCount} {unitLabel}{selectedCount === 1 ? '' : 's'}
                       </span>
-                      <button type="button" onClick={() => setSelectedDateStr(null)} className="ml-1 text-neutral-500 hover:text-neutral-300 cursor-pointer">
-                        <X size={13} />
+                      <button type="button" onClick={() => setSelectedDateStr(null)} className={`ml-1 cursor-pointer ${mutedText} hover:${headingText}`}>
+                        <X size={12} />
                       </button>
                     </div>
                   ) : (
-                    <div className={isDark ? 'text-[#8b949e]' : 'text-neutral-500'}>
-                      Click any square to view its exact date
+                    <div className={mutedText}>
+                      Click any square to inspect date
                     </div>
                   )}
 
-                  <div className={`flex items-center gap-1.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                  <div className={`flex items-center gap-1.5 ${mutedText}`}>
                     <span>Less</span>
                     {[0, 1, 2, 4, 6].map((lvl) => (
-                      <span key={lvl} className={`w-[12px] h-[12px] rounded-[2px] inline-block ${getGitHubCellColor(lvl)}`} />
+                      <span key={lvl} className={`w-[11px] h-[11px] rounded-[2px] inline-block ${getHeatmapCellColor(lvl)}`} />
                     ))}
                     <span>More</span>
                   </div>
@@ -628,24 +568,24 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
             </>
           ) : (
             <>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs sm:text-sm mb-2 font-mono gap-1">
-                <a href={`https://codeforces.com/profile/${personalInfo.codeforcesHandle}`} target="_blank" rel="noreferrer" className={`hover:underline ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs mb-3 font-mono gap-1">
+                <a href={`https://codeforces.com/profile/${personalInfo.codeforcesHandle}`} target="_blank" rel="noreferrer" className={`hover:underline underline-offset-4 ${mutedText}`}>
                   codeforces.com/profile/{personalInfo.codeforcesHandle}
                 </a>
-                <span className={isDark ? 'text-[#8b949e]' : 'text-neutral-500'}>
+                <span className={mutedText}>
                   active up to {formatDisplayDate(toLocalDateKey(new Date()))}
                 </span>
               </div>
 
               <div className="space-y-3">
-                <div className={`overflow-x-auto overflow-y-hidden pb-3 border-b ${isDark ? 'border-neutral-800' : 'border-neutral-200'}`}>
-                  <div className="pt-6 w-full flex justify-center">
+                <div className={`overflow-x-auto overflow-y-hidden pb-3 border-b ${hairline}`}>
+                  <div className="pt-5 w-full flex justify-center">
                     <div className="flex flex-col">
                       <div className="flex gap-[3px] pl-8 mb-1.5 h-4 items-end">
                         {mainCalendarWeeks.map((week) => (
                           <div key={week.weekIdx} className="w-[13px] relative shrink-0">
                             {week.monthLabel && (
-                              <span className={`absolute bottom-0 left-0 text-[11px] font-mono leading-none select-none ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                              <span className={`absolute bottom-0 left-0 text-[11px] font-mono leading-none select-none ${mutedText}`}>
                                 {week.monthLabel}
                               </span>
                             )}
@@ -654,7 +594,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                       </div>
 
                       <div className="flex gap-2 items-start">
-                        <div className={`flex flex-col gap-[3px] text-[11px] font-mono w-6 shrink-0 select-none ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+                        <div className={`flex flex-col gap-[3px] text-[11px] font-mono w-6 shrink-0 select-none ${mutedText}`}>
                           <span className="h-[13px] leading-[13px] opacity-0">Sun</span>
                           <span className="h-[13px] leading-[13px]">Mon</span>
                           <span className="h-[13px] leading-[13px] opacity-0">Tue</span>
@@ -670,7 +610,7 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                               {week.days.map((day) => {
                                 const count = cfSubmissions[day.dateStr] || 0;
                                 const isSelected = selectedDateStr === day.dateStr;
-                                const colorClass = getGitHubCellColor(count);
+                                const colorClass = getHeatmapCellColor(count);
 
                                 return (
                                   <div key={day.dateStr} className="relative">
@@ -679,8 +619,10 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                                       onClick={() => setSelectedDateStr(prev => (prev === day.dateStr ? null : day.dateStr))}
                                       aria-label={`${formatDisplayDate(day.dateStr)}: ${count} submission${count === 1 ? '' : 's'}`}
                                       title={`${formatDisplayDate(day.dateStr)} — ${count} submission${count === 1 ? '' : 's'}`}
-                                      className={`block w-[13px] h-[13px] rounded-[3px] cursor-pointer transition-transform duration-150 focus:outline-none ${colorClass} ${
-                                        isSelected ? 'ring-2 ring-white scale-125 z-20 relative' : 'hover:scale-125 hover:z-10'
+                                      className={`block w-[13px] h-[13px] rounded-[2px] cursor-pointer transition-transform duration-150 focus:outline-none ${colorClass} ${
+                                        isSelected
+                                          ? isDark ? 'ring-1 ring-white scale-125 z-20 relative' : 'ring-1 ring-black scale-125 z-20 relative'
+                                          : 'hover:scale-125 hover:z-10'
                                       }`}
                                     />
                                   </div>
@@ -695,19 +637,22 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
                 </div>
               </div>
 
-              <div className={`flex flex-wrap justify-between items-center gap-4 pt-4 mt-4 border-t text-sm font-mono ${isDark ? 'border-neutral-800' : 'border-neutral-200'}`}>
+              <div className="flex flex-wrap justify-between items-center gap-4 pt-3 text-xs font-mono">
                 <div className="flex gap-6">
                   <div>
-                    <span className="text-neutral-500">solved: </span>
-                    <span className={isDark ? 'text-white' : 'text-neutral-900'}>{cfDetailedStats.solvedAllTime}</span>
+                    <span className={mutedText}>solved: </span>
+                    <span className={headingText}>{cfDetailedStats.solvedAllTime}</span>
                   </div>
                   <div>
-                    <span className="text-neutral-500">rating: </span>
-                    <span className={isDark ? 'text-white' : 'text-neutral-900'}>{cfDetailedStats.rating}</span>
+                    <span className={mutedText}>rating: </span>
+                    <span className={headingText}>{cfDetailedStats.rating}</span>
                   </div>
                 </div>
-                <button onClick={() => setShowAnalyticsModal(true)} className={`underline underline-offset-4 cursor-pointer ${isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'}`}>
-                  detailed stats →
+                <button
+                  onClick={() => setShowAnalyticsModal(true)}
+                  className={`underline underline-offset-4 cursor-pointer transition-colors ${isDark ? 'text-[#a3a3a3] hover:text-white' : 'text-[#525252] hover:text-black'}`}
+                >
+                  Detailed stats →
                 </button>
               </div>
             </>
@@ -715,26 +660,23 @@ export default function HomePage({ isDark, setCurrentPage, setPreviousPage, setS
         </div>
       </section>
 
-      <hr className={isDark ? 'border-neutral-800/80' : 'border-neutral-200'} />
-
-      {/* Technical Skills Section */}
+      {/* TECHNICAL SKILLS */}
       <section className="space-y-4">
-        <h2 className={`text-xs sm:text-sm font-mono uppercase tracking-wider ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+        <h2 className={`text-xl sm:text-2xl font-semibold ${headingText}`}>
           Technical Skills
         </h2>
-        <div className={`divide-y border-t border-b text-sm sm:text-base ${isDark ? 'divide-neutral-800/70 border-neutral-800' : 'divide-neutral-200 border-neutral-200'}`}>
+        <div className={`divide-y border-t border-b ${divider} ${hairline}`}>
           {skillsData.map((group) => (
-            <div key={group.category} className="py-4 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
-              <span className="text-neutral-500 font-mono text-sm sm:w-40 shrink-0">
+            <div
+              key={group.category}
+              className="py-3.5 flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-8"
+            >
+              <span className={`font-mono text-sm sm:w-44 shrink-0 ${mutedText}`}>
                 {group.category}
               </span>
-              <div className="flex flex-wrap gap-2">
-                {group.items.map((skill) => (
-                  <span key={skill} className={`text-xs sm:text-sm font-mono border px-3 py-1 rounded-md ${isDark ? 'text-neutral-300 bg-neutral-900/90 border-neutral-800' : 'text-neutral-700 bg-neutral-100 border-neutral-200'}`}>
-                    {skill}
-                  </span>
-                ))}
-              </div>
+              <span className={`text-base ${isDark ? 'text-[#e5e5e5]' : 'text-[#171717]'}`}>
+                {group.items.join(' · ')}
+              </span>
             </div>
           ))}
         </div>

@@ -8,6 +8,7 @@ export const personalInfo = {
   email: "1at24cs251@atria.edu",
   githubHandle: "VigneshSSuvarna",
   codeforcesHandle: "VigneshSSuvarna",
+  linkedinUrl: "https://www.linkedin.com/in/vignesh-suvarna-020631339",
   resumePath: "/resume.pdf",
   initialVisitorCount: 198,
   cfBaselineDate: new Date(2025, 10, 20).getTime(), // Nov 20, 2025

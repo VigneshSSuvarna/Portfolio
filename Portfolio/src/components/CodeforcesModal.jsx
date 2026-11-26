@@ -23,11 +23,11 @@ export const CodeforcesModal = ({
   const modalCalendarWeeks = buildCalendarWeeks(modalYearFilter);
 
   const getCfCellColor = (count) => {
-    if (count <= 0) return isDark ? "bg-[#161b22]" : "bg-[#ebedf0]";
-    if (count === 1) return isDark ? "bg-[#0e4429]" : "bg-[#85e89d]";
-    if (count === 2) return isDark ? "bg-[#006d32]" : "bg-[#34d058]";
-    if (count <= 4) return isDark ? "bg-[#26a641]" : "bg-[#28a745]";
-    return isDark ? "bg-[#39d353]" : "bg-[#22863a]";
+    if (count <= 0) return isDark ? "bg-[#1f1f1f]" : "bg-[#ebedf0]";
+    if (count === 1) return isDark ? "bg-[#0e4429]" : "bg-[#9be9a8]";
+    if (count === 2) return isDark ? "bg-[#006d32]" : "bg-[#40c463]";
+    if (count <= 4) return isDark ? "bg-[#26a641]" : "bg-[#30a14e]";
+    return isDark ? "bg-[#39d353]" : "bg-[#216e39]";
   };
 
   const svgWidth = 760;
@@ -73,18 +73,18 @@ export const CodeforcesModal = ({
 
   const bands = isDark
     ? [
-        { low: minRating, high: 1200, color: "#1f242d" },
-        { low: 1200, high: 1400, color: "#0e3a20" },
-        { low: 1400, high: 1600, color: "#0e363a" },
-        { low: 1600, high: 1900, color: "#22254a" },
-        { low: 1900, high: maxRating, color: "#451c45" }
+        { low: minRating, high: 1200, color: "#111111" },
+        { low: 1200, high: 1400, color: "#171717" },
+        { low: 1400, high: 1600, color: "#1f1f1f" },
+        { low: 1600, high: 1900, color: "#262626" },
+        { low: 1900, high: maxRating, color: "#2e2e2e" }
       ]
     : [
-        { low: minRating, high: 1200, color: "#cccccc" },
-        { low: 1200, high: 1400, color: "#77ff77" },
-        { low: 1400, high: 1600, color: "#77ddbb" },
-        { low: 1600, high: 1900, color: "#aaaaff" },
-        { low: 1900, high: maxRating, color: "#ff88ff" }
+        { low: minRating, high: 1200, color: "#ffffff" },
+        { low: 1200, high: 1400, color: "#fafafa" },
+        { low: 1400, high: 1600, color: "#f5f5f5" },
+        { low: 1600, high: 1900, color: "#eeeeee" },
+        { low: 1900, high: maxRating, color: "#e5e5e5" }
       ];
 
   const yTicks = zoomEnabled ? [400, 600, 800, 1000, 1200] : [1200, 1400, 1600, 1900];
@@ -109,8 +109,8 @@ export const CodeforcesModal = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`border rounded-lg w-full max-w-4xl p-4 sm:p-6 space-y-4 my-auto max-h-[94vh] overflow-y-auto shadow-2xl transition-colors ${
-          isDark ? 'bg-[#141414] border-neutral-800' : 'bg-white border-neutral-300'
+        className={`border rounded-sm w-full max-w-4xl p-4 sm:p-6 space-y-4 my-auto max-h-[94vh] overflow-y-auto transition-colors ${
+          isDark ? 'bg-[#111111] border-neutral-800' : 'bg-white border-neutral-200'
         }`}
       >
         <div
@@ -120,26 +120,22 @@ export const CodeforcesModal = ({
         >
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <h2
-              className={`text-base font-mono font-semibold ${
-                isDark ? 'text-white' : 'text-neutral-900'
+              className={`text-sm sm:text-base font-mono font-medium ${
+                isDark ? 'text-white' : 'text-black'
               }`}
             >
               codeforces_analytics
             </h2>
-            <span
-              className={`text-xs font-mono px-2 py-0.5 rounded ${
-                isDark ? 'bg-neutral-800 text-neutral-300' : 'bg-neutral-200 text-neutral-700'
-              }`}
-            >
+            <span className="text-xs font-mono text-[#737373]">
               @VigneshSSuvarna
             </span>
             <button
               onClick={syncLiveActivity}
               title="Sync latest data from Codeforces API"
-              className={`inline-flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded border cursor-pointer transition-colors ${
+              className={`inline-flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded-sm border cursor-pointer transition-colors ${
                 isDark
-                  ? 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white'
-                  : 'border-neutral-300 bg-white text-neutral-600 hover:text-black'
+                  ? 'border-neutral-800 bg-[#171717] text-[#a3a3a3] hover:text-white hover:border-neutral-600'
+                  : 'border-neutral-200 bg-[#fafafa] text-[#737373] hover:text-black hover:border-neutral-400'
               }`}
             >
               <RefreshCw size={11} className={isSyncingCf ? 'animate-spin' : ''} />
@@ -148,8 +144,9 @@ export const CodeforcesModal = ({
           </div>
           <button
             onClick={onClose}
-            className={`cursor-pointer p-1 rounded ${
-              isDark ? 'text-neutral-400 hover:text-white' : 'text-neutral-500 hover:text-neutral-900'
+            aria-label="Close analytics modal"
+            className={`cursor-pointer p-1 transition-colors ${
+              isDark ? 'text-[#737373] hover:text-white' : 'text-[#737373] hover:text-black'
             }`}
           >
             <X size={18} />
@@ -158,23 +155,23 @@ export const CodeforcesModal = ({
 
         {/* Rating Graph */}
         <div
-          className={`border rounded-md p-3.5 shadow-xs transition-colors overflow-x-auto ${
+          className={`border rounded-sm p-3.5 transition-colors overflow-x-auto ${
             isDark
-              ? 'bg-[#0d1117] border-neutral-800 text-[#c9d1d9]'
-              : 'bg-white border-neutral-300 text-neutral-800'
+              ? 'bg-[#111111] border-neutral-800 text-[#e5e5e5]'
+              : 'bg-white border-neutral-200 text-[#171717]'
           }`}
         >
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1.5 text-xs font-sans gap-2">
-            <span className={isDark ? 'text-neutral-400' : 'text-neutral-500'}>
-              Click on the graph to enable the zoom feature.
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1.5 text-xs font-mono gap-2">
+            <span className="text-[#737373]">
+              Click on the graph to toggle zoom.
             </span>
             <select
               value={ratingFilter}
               onChange={(e) => setRatingFilter(e.target.value)}
-              className={`border rounded px-2 py-0.5 text-xs focus:outline-none cursor-pointer ${
+              className={`border rounded-sm px-2 py-0.5 text-xs font-mono focus:outline-none cursor-pointer ${
                 isDark
-                  ? 'bg-neutral-900 border-neutral-700 text-white'
-                  : 'bg-white border-neutral-300 text-neutral-800'
+                  ? 'bg-[#171717] border-neutral-800 text-white'
+                  : 'bg-white border-neutral-200 text-black'
               }`}
             >
               <option value="rated">Only rated</option>
@@ -213,17 +210,16 @@ export const CodeforcesModal = ({
                       y1={y}
                       x2={padLeft + plotW}
                       y2={y}
-                      stroke={isDark ? "#30363d" : "#999999"}
-                      strokeWidth="0.7"
-                      strokeOpacity="0.6"
+                      stroke={isDark ? "#262626" : "#e5e5e5"}
+                      strokeWidth="0.8"
                     />
                     <text
                       x={padLeft - 6}
                       y={y + 4}
                       textAnchor="end"
                       fontSize="11"
-                      fill={isDark ? "#8b949e" : "#4b5563"}
-                      fontFamily="sans-serif"
+                      fill="#737373"
+                      fontFamily="var(--font-mono)"
                     >
                       {val}
                     </text>
@@ -240,17 +236,16 @@ export const CodeforcesModal = ({
                       y1={padTop}
                       x2={x}
                       y2={padTop + plotH}
-                      stroke={isDark ? "#30363d" : "#888888"}
-                      strokeWidth="0.7"
-                      strokeOpacity="0.55"
+                      stroke={isDark ? "#262626" : "#e5e5e5"}
+                      strokeWidth="0.8"
                     />
                     <text
                       x={x}
                       y={padTop + plotH + 15}
                       textAnchor="middle"
                       fontSize="11"
-                      fill={isDark ? "#8b949e" : "#4b5563"}
-                      fontFamily="sans-serif"
+                      fill="#737373"
+                      fontFamily="var(--font-mono)"
                     >
                       {tick.labelTop}
                     </text>
@@ -259,8 +254,8 @@ export const CodeforcesModal = ({
                       y={padTop + plotH + 29}
                       textAnchor="middle"
                       fontSize="11"
-                      fill={isDark ? "#8b949e" : "#4b5563"}
-                      fontFamily="sans-serif"
+                      fill="#737373"
+                      fontFamily="var(--font-mono)"
                     >
                       {tick.labelBottom}
                     </text>
@@ -274,20 +269,14 @@ export const CodeforcesModal = ({
                 width={plotW}
                 height={plotH}
                 fill="none"
-                stroke={isDark ? "#30363d" : "#555555"}
-                strokeWidth="1.5"
+                stroke={isDark ? "#262626" : "#d4d4d4"}
+                strokeWidth="1.2"
               />
 
               <polyline
                 fill="none"
-                stroke="rgba(0,0,0,0.3)"
-                strokeWidth="3"
-                points={points.map(p => `${p.x},${p.y + 1.5}`).join(' ')}
-              />
-              <polyline
-                fill="none"
-                stroke="#eab308"
-                strokeWidth="2.4"
+                stroke={isDark ? "#ffffff" : "#000000"}
+                strokeWidth="2"
                 points={polylinePoints}
               />
 
@@ -298,10 +287,10 @@ export const CodeforcesModal = ({
                     key={idx}
                     cx={pt.x}
                     cy={pt.y}
-                    r={isLast ? 4 : 3.5}
-                    fill={isDark ? "#161b22" : "#ffffff"}
-                    stroke={isLast ? "#ef4444" : "#eab308"}
-                    strokeWidth={isLast ? "2.2" : "1.8"}
+                    r={isLast ? 4.5 : 3.5}
+                    fill={isLast ? (isDark ? "#ffffff" : "#000000") : (isDark ? "#111111" : "#ffffff")}
+                    stroke={isDark ? "#ffffff" : "#000000"}
+                    strokeWidth="1.8"
                     onMouseEnter={() => setHoveredContest(pt)}
                     onMouseLeave={() => setHoveredContest(null)}
                   />
@@ -314,8 +303,8 @@ export const CodeforcesModal = ({
                   y="0"
                   width="116"
                   height="18"
-                  fill={isDark ? "rgba(22, 27, 34, 0.9)" : "rgba(255,255,255,0.88)"}
-                  stroke={isDark ? "#30363d" : "#d1d5db"}
+                  fill={isDark ? "#111111" : "#ffffff"}
+                  stroke={isDark ? "#262626" : "#e5e5e5"}
                   strokeWidth="0.8"
                 />
                 <rect
@@ -323,16 +312,14 @@ export const CodeforcesModal = ({
                   y="3.5"
                   width="12"
                   height="11"
-                  fill="#eab308"
-                  stroke="#ca8a04"
-                  strokeWidth="0.7"
+                  fill={isDark ? "#ffffff" : "#000000"}
                 />
                 <text
                   x="20"
                   y="13"
-                  fontSize="11"
-                  fill={isDark ? "#c9d1d9" : "#374151"}
-                  fontFamily="sans-serif"
+                  fontSize="10.5"
+                  fill={isDark ? "#e5e5e5" : "#171717"}
+                  fontFamily="var(--font-mono)"
                 >
                   VigneshSSuvarna
                 </text>
@@ -340,10 +327,12 @@ export const CodeforcesModal = ({
             </svg>
 
             {hoveredContest && (
-              <div className="absolute top-3 left-14 bg-neutral-900 text-white text-xs font-mono px-2.5 py-1.5 rounded shadow-md pointer-events-none z-20 border border-neutral-700">
+              <div className={`absolute top-3 left-14 text-xs font-mono px-2.5 py-1.5 rounded-sm pointer-events-none z-20 border ${
+                isDark ? 'bg-[#171717] text-white border-neutral-700' : 'bg-white text-black border-neutral-300'
+              }`}>
                 <div className="font-semibold">{hoveredContest.contestName}</div>
-                <div className="text-neutral-300">
-                  Rating: <span className="text-yellow-400 font-bold">{hoveredContest.newRating}</span> ({formatDisplayDate(hoveredContest.dateStr)})
+                <div className={isDark ? 'text-[#a3a3a3]' : 'text-[#525252]'}>
+                  Rating: <span className={`font-semibold ${isDark ? 'text-white' : 'text-black'}`}>{hoveredContest.newRating}</span> ({formatDisplayDate(hoveredContest.dateStr)})
                 </div>
               </div>
             )}
@@ -352,20 +341,20 @@ export const CodeforcesModal = ({
 
         {/* Detailed Stats Box */}
         <div
-          className={`border rounded-md p-4 sm:p-5 shadow-xs space-y-5 transition-colors ${
-            isDark ? 'bg-[#0d1117] border-neutral-800 text-[#c9d1d9]' : 'bg-white border-neutral-300 text-neutral-800'
+          className={`border rounded-sm p-4 sm:p-5 space-y-5 transition-colors ${
+            isDark ? 'bg-[#111111] border-neutral-800 text-[#e5e5e5]' : 'bg-white border-neutral-200 text-[#171717]'
           }`}
         >
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             {modalSelectedDateStr ? (
               <div
-                className={`inline-flex items-center gap-2 text-xs font-mono px-2.5 py-1 rounded border ${
+                className={`inline-flex items-center gap-2 text-xs font-mono px-2.5 py-1 rounded-sm border ${
                   isDark
-                    ? 'bg-neutral-900 border-neutral-700 text-white'
-                    : 'bg-neutral-100 border-neutral-300 text-neutral-800'
+                    ? 'bg-[#171717] border-neutral-800 text-white'
+                    : 'bg-[#fafafa] border-neutral-200 text-black'
                 }`}
               >
-                <Calendar size={13} className="text-[#39d353]" />
+                <Calendar size={13} className={isDark ? 'text-white' : 'text-black'} />
                 <span>
                   <strong>{formatDisplayDate(modalSelectedDateStr)}</strong> —{' '}
                   {cfSubmissions[modalSelectedDateStr] || 0} submission
@@ -374,13 +363,13 @@ export const CodeforcesModal = ({
                 <button
                   type="button"
                   onClick={() => setModalSelectedDateStr(null)}
-                  className="text-neutral-400 hover:text-white cursor-pointer"
+                  className="text-[#737373] hover:text-white cursor-pointer"
                 >
                   <X size={12} />
                 </button>
               </div>
             ) : (
-              <span className="text-xs text-neutral-400">
+              <span className="text-xs font-mono text-[#737373]">
                 Click any box to inspect date
               </span>
             )}
@@ -391,10 +380,10 @@ export const CodeforcesModal = ({
                 setModalYearFilter(e.target.value);
                 setModalSelectedDateStr(null);
               }}
-              className={`border rounded px-2.5 py-1 text-xs focus:outline-none cursor-pointer ${
+              className={`border rounded-sm px-2.5 py-1 text-xs font-mono focus:outline-none cursor-pointer ${
                 isDark
-                  ? 'bg-neutral-900 border-neutral-700 text-white'
-                  : 'bg-white border-neutral-300 text-neutral-800'
+                  ? 'bg-[#171717] border-neutral-800 text-white'
+                  : 'bg-white border-neutral-200 text-black'
               }`}
             >
               <option value="rolling">Choose year</option>
@@ -409,11 +398,7 @@ export const CodeforcesModal = ({
                 {modalCalendarWeeks.map((week) => (
                   <div key={week.weekIdx} className="w-[11.5px] relative shrink-0">
                     {week.monthLabel && (
-                      <span
-                        className={`absolute bottom-0 left-0 text-[11px] font-sans leading-none select-none ${
-                          isDark ? 'text-[#8b949e]' : 'text-neutral-500'
-                        }`}
-                      >
+                      <span className="absolute bottom-0 left-0 text-[11px] font-mono leading-none select-none text-[#737373]">
                         {week.monthLabel}
                       </span>
                     )}
@@ -422,11 +407,7 @@ export const CodeforcesModal = ({
               </div>
 
               <div className="flex gap-2 items-start">
-                <div
-                  className={`flex flex-col gap-[2px] text-[11px] font-sans w-6 shrink-0 select-none ${
-                    isDark ? 'text-[#8b949e]' : 'text-neutral-500'
-                  }`}
-                >
+                <div className="flex flex-col gap-[2px] text-[11px] font-mono w-6 shrink-0 select-none text-[#737373]">
                   <span className="h-[11.5px] leading-[11.5px] opacity-0">Sun</span>
                   <span className="h-[11.5px] leading-[11.5px]">Mon</span>
                   <span className="h-[11.5px] leading-[11.5px] opacity-0">Tue</span>
@@ -466,8 +447,8 @@ export const CodeforcesModal = ({
                               className={`block w-[11.5px] h-[11.5px] rounded-[1px] cursor-pointer transition-transform duration-100 focus:outline-none ${colorClass} ${
                                 isSelected
                                   ? isDark
-                                    ? 'ring-2 ring-white scale-125 z-20 relative'
-                                    : 'ring-2 ring-neutral-900 scale-125 z-20 relative'
+                                    ? 'ring-1 ring-white scale-125 z-20 relative'
+                                    : 'ring-1 ring-black scale-125 z-20 relative'
                                   : 'hover:scale-125 hover:z-10'
                               }`}
                             />
@@ -483,55 +464,55 @@ export const CodeforcesModal = ({
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-5 gap-x-8 pt-2 pl-2 font-sans">
             <div>
-              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-black'}`}>
                 {cfDetailedStats.solvedAllTime} problems
               </div>
-              <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+              <div className="text-xs mt-0.5 text-[#737373]">
                 solved for all time
               </div>
             </div>
 
             <div>
-              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-black'}`}>
                 {cfDetailedStats.solvedLastYear} problems
               </div>
-              <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+              <div className="text-xs mt-0.5 text-[#737373]">
                 solved for the last year
               </div>
             </div>
 
             <div>
-              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-black'}`}>
                 {cfDetailedStats.solvedLastMonth} problems
               </div>
-              <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+              <div className="text-xs mt-0.5 text-[#737373]">
                 solved for the last month
               </div>
             </div>
 
             <div>
-              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-black'}`}>
                 {cfDetailedStats.streakMax} days
               </div>
-              <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+              <div className="text-xs mt-0.5 text-[#737373]">
                 in a row max.
               </div>
             </div>
 
             <div>
-              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-black'}`}>
                 {cfDetailedStats.streakLastYear} days
               </div>
-              <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+              <div className="text-xs mt-0.5 text-[#737373]">
                 in a row for the last year
               </div>
             </div>
 
             <div>
-              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+              <div className={`text-xl sm:text-2xl font-normal ${isDark ? 'text-white' : 'text-black'}`}>
                 {cfDetailedStats.streakLastMonth} days
               </div>
-              <div className={`text-xs mt-0.5 ${isDark ? 'text-[#8b949e]' : 'text-neutral-500'}`}>
+              <div className="text-xs mt-0.5 text-[#737373]">
                 in a row for the last month
               </div>
             </div>
@@ -540,23 +521,14 @@ export const CodeforcesModal = ({
 
         <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 pt-1 text-xs font-mono">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={isDark ? 'text-neutral-400' : 'text-neutral-500'}>Focus Areas:</span>
-            {(cfDetailedStats.tags || ["Greedy", "Math", "Brute Force", "Implementation", "Sorting"]).map(tag => (
-              <span
-                key={tag}
-                className={`px-2 py-0.5 border rounded ${
-                  isDark
-                    ? 'bg-neutral-900 border-neutral-800 text-neutral-300'
-                    : 'bg-white border-neutral-300 text-neutral-700'
-                }`}
-              >
-                {tag}
-              </span>
-            ))}
+            <span className="text-[#737373]">Focus Areas:</span>
+            <span className={isDark ? 'text-[#e5e5e5]' : 'text-[#171717]'}>
+              {(cfDetailedStats.tags || ["Greedy", "Math", "Brute Force", "Implementation", "Sorting"]).join(' · ')}
+            </span>
           </div>
-          <div className={isDark ? 'text-neutral-400' : 'text-neutral-600'}>
+          <div className="text-[#737373]">
             Primary Languages:{' '}
-            <span className={isDark ? 'text-white font-semibold' : 'text-black font-semibold'}>
+            <span className={isDark ? 'text-white font-medium' : 'text-black font-medium'}>
               {cfDetailedStats.languages || "C++, Python"}
             </span>
           </div>

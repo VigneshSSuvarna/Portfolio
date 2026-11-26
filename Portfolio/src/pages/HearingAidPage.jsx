@@ -3,24 +3,26 @@ import { ArrowLeft } from 'lucide-react';
 import { CaseStudyMetaBar } from '../components/CaseStudyMetaBar';
 
 export default function HearingAidPage({ isDark, previousPage, setCurrentPage }) {
+  const headingText = isDark ? 'text-white' : 'text-black';
+  const bodyText = isDark ? 'text-[#a3a3a3]' : 'text-[#525252]';
+  const mutedText = 'text-[#737373]';
+
   return (
     <div className="space-y-8">
       <div>
         <button
           onClick={() => setCurrentPage(previousPage)}
-          className={`inline-flex items-center gap-2 text-xs sm:text-sm font-mono mb-6 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
-            isDark
-              ? 'border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800'
-              : 'border-neutral-300 bg-neutral-100 text-neutral-700 hover:text-black hover:bg-neutral-200'
+          className={`inline-flex items-center gap-1.5 text-xs font-mono mb-6 cursor-pointer hover:underline underline-offset-4 transition-colors ${
+            isDark ? 'text-[#a3a3a3] hover:text-white' : 'text-[#525252] hover:text-black'
           }`}
         >
-          <ArrowLeft size={16} /> Back to {previousPage === 'home' ? 'About' : 'Projects'}
+          <ArrowLeft size={14} /> Back to {previousPage === 'home' ? 'About' : 'Projects'}
         </button>
-        <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+        <h1 className={`text-2xl sm:text-3xl font-semibold tracking-tight ${headingText}`}>
           HearingAid Pro
         </h1>
-        <p className={`text-xs sm:text-sm font-mono mt-1 ${isDark ? 'text-[#39d353]' : 'text-emerald-700'}`}>
-          Dr. S. R. Chandrasekhar Institute of Speech and Hearing • Project Team Lead
+        <p className={`text-xs sm:text-sm font-mono mt-1 ${mutedText}`}>
+          Dr. S. R. Chandrasekhar Institute of Speech and Hearing · Project Team Lead
         </p>
       </div>
 
@@ -33,11 +35,9 @@ export default function HearingAidPage({ isDark, previousPage, setCurrentPage })
         isDark={isDark}
       />
 
-      <div className={`space-y-6 text-sm sm:text-base leading-relaxed p-6 sm:p-10 rounded-2xl border ${
-        isDark ? 'bg-neutral-900/40 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700'
-      }`}>
+      <div className={`max-w-3xl space-y-8 pt-2 text-sm sm:text-base leading-relaxed ${bodyText}`}>
         <div>
-          <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+          <h3 className={`font-mono text-xs uppercase tracking-widest mb-2.5 ${mutedText}`}>
             1. Abstract
           </h3>
           <p>
@@ -46,7 +46,7 @@ export default function HearingAidPage({ isDark, previousPage, setCurrentPage })
         </div>
 
         <div>
-          <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+          <h3 className={`font-mono text-xs uppercase tracking-widest mb-2.5 ${mutedText}`}>
             2. The Real-Time Audio Challenge
           </h3>
           <p>
@@ -55,25 +55,25 @@ export default function HearingAidPage({ isDark, previousPage, setCurrentPage })
         </div>
 
         <div>
-          <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+          <h3 className={`font-mono text-xs uppercase tracking-widest mb-2.5 ${mutedText}`}>
             3. Core DSP & Signal Pipeline
           </h3>
           <p className="mb-3">The application relies on an advanced software-driven signal chain to shape and clean audio streams:</p>
           <ul className="space-y-3 list-disc list-inside">
             <li>
-              <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Spectral Noise Suppression:</span> Implements frequency-domain filtering to dynamically reduce background ambient noise and adapt to room acoustics.
+              <span className={`font-medium ${headingText}`}>Spectral Noise Suppression:</span> Implements frequency-domain filtering to dynamically reduce background ambient noise and adapt to room acoustics.
             </li>
             <li>
-              <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Parametric Equalization:</span> Features configurable biquad filter bands for precise frequency shaping, paired with automated headroom scaling to prevent audio clipping.
+              <span className={`font-medium ${headingText}`}>Parametric Equalization:</span> Features configurable biquad filter bands for precise frequency shaping, paired with automated headroom scaling to prevent audio clipping.
             </li>
             <li>
-              <span className={`font-medium ${isDark ? 'text-white' : 'text-neutral-900'}`}>Live Visualizations:</span> Drives real-time time-domain waveforms and frequency spectrum analyzers via custom canvas rendering and optimized FFT processing.
+              <span className={`font-medium ${headingText}`}>Live Visualizations:</span> Drives real-time time-domain waveforms and frequency spectrum analyzers via custom canvas rendering and optimized FFT processing.
             </li>
           </ul>
         </div>
 
         <div>
-          <h3 className={`font-mono text-xs sm:text-sm uppercase tracking-wider mb-2 ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+          <h3 className={`font-mono text-xs uppercase tracking-widest mb-2.5 ${mutedText}`}>
             Conclusion
           </h3>
           <p>
